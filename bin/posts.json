@@ -2,17 +2,19 @@
   {
     "id": "keller_1",
     "title": "test post1",
-    "date": "1429945333047",
+    "date": 1429945333047,
     "description": "keller's first markdown post",
-    "file": "keller_1",
+    "md_file": "/keller_1.md",
+    "html_file": "/keller_1.html",
     "url": "/2015/4/25/keller-1"
   },
   {
     "id": "keller_2",
-    "title": "test post2",
-    "date": "1429945591506",
+    "title": "关于博客",
+    "date": 1429945591506,
     "description": "keller's second markdown post",
-    "file": "keller_2",
+    "md_file": "/keller_2.md",
+    "html_file": "/keller_2.html",
     "url": "/2015/4/25/keller-2"
   }
 ]

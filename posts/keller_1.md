@@ -1,187 +1,260 @@
-Love it or hate, you just cannot ignore JavaScript, there are countless tools and languages that compile to JavaScript popping up everywhere. Being a JavaScript lover it was only natural that I got really excited when Node.js was released. If you are not familiar with Node.js head over to [http://nodejs.org](http://nodejs.org) and find what it's all about.
+So you have been playing around with Node.js writing pretty little programs and marvelling at how awesome it is. You have finally wrapped your brain around this async stuff and feel confident that you can go to callback hell and still find your way back. But then you realise, your newly acquired wizardry isn't that much fun if you cannot collect data, store it in a database, and do something useful with it. So you jump on your broom and start surfing the interwebs in search of a solution.
 
-This article is not a fan-boy rant but rather a documentation of how I'm using Node.js to make real world apps.
+When you search the internet for a Node.js database solution you will quickly notice how popular NoSQL databases are. As someone who is new to Node.js it is easy to start believing that it only speaks to NoSQL databases or that it doesn't work well with SQL databases. I held this perception for quite a long time. Sometimes a SQL database may be a better solution for you, it is a good fit if you are dealing with a lot of relational data that requires complex queries. Node.js prides itself at being very efficient in performing IO intensive tasks - that includes communicating with both SQL and NoSQL databases. [Ghost](https://github.com/TryGhost/Ghost), one of the most prominent opensource Node projects, uses SQL databases. Today I will share with you how I use MySQL in my Node.js projects.
 
-### My Environment
-My first taste of Node was on a Windows XP machine, when the Node Windows installer became available I downloaded it and started experimenting and writing small programs. Everything worked out fine but running everything locally became a bit of a bore so earlier this year I signed up for a VPS with my web hosting company so that I could start using Node in production.
+### Choosing an ORM
+The standard way of connecting to a database in most platforms is through an ORM, it provides a nice API to interact with your programs. After doing some research I came across Bookshelf.js, it is described as a JavaScript ORM for Node.js, built on the Knex SQL query builder and designed to work well with PostgreSQL, MySQL, and SQLite3.
 
-### Server Specs
- - CentOS
- - 2 vCPUs
- - 4 Gig RAM
- - Software: CPanel 11.32.3
- 
-### Installing Node.js
+My decision to pick [Bookshelf.js](http://bookshelfjs.org) was influenced by the following reasons:
 
-This is my first time managing and running a dedicated server so I have been doing a lot of  'googling' to get things done.
+ - It has good documentation
+ - It extends the Model and Collection patterns of Backbone.js - which I was already familiar with.
+ - It is used by the [Ghost](https://github.com/TryGhost/Ghost) project - while reading the project's code base I found it quite intuitive.
+ - It uses promises which makes handling callbacks less painful
+ - It has a large community following and is actively maintained
 
-I found a useful gist posted by the current Node.js gatekeeper, Isaac Schlueter, the first method of installation worked for me. My work station runs on windows so I used the Windows Commandline to make a SSH connection to my server.
+### Getting started
+To get up and running you need to install [Bookshelf.js](http://bookshelfjs.org) and its dependencies.
 
-    echo 'export PATH=$HOME/local/bin:$PATH' >> ~/.bashrc
-    . ~/.bashrc 
-    mkdir ~/local
-    mkdir ~/node-latest-install
-    cd ~/node-latest-install
-    curl http://nodejs.org/dist/node-latest.tar.gz | tar xz --strip-components=1
-    ./configure --prefix=~/local
-    make install # ok, fine, this step probably takes more than 30 seconds...
-    curl http://npmjs.org/install.sh | sh
+    npm install bookshelf mysql knex --save
 
-With these few lines of code Node.js was installed without any hiccups. What is awesome about Node.js is that it comes bungled with NPM, a Node package manager, which is a handy tool when installing modules for your projects.
+Making a database connection is pretty straight forward, let's do it in `app.js`:
 
-### The App
-My first Node.js app is the official website for my projects. I didn't want to get too fancy on uncharted territory so I kept it simple,  to get started I needed a mature and robust framework. I chose Express because I have had a bit of experience using it on my local server and I'm a big fan of the author's work, [TJ Holowaychuk](https://github.com/visionmedia). Navigate to your projects directory from the command line and install Express.
+### app.js
 
-    #use npm to install express
-    npm install -g express
- 
-    #start a project
-    express ragingflame
- 
-    #open the project directory and install dependencies
-    cd ragingflame &amp;&amp; npm install
+    var knex = require('knex')({
+        client: 'mysql',
+        connection: {
+            host     : '127.0.0.1',
+            user     : 'your_database_user',
+            password : 'your_database_password',
+            database : 'myapp_test',
+            charset  : 'utf8'
+      }
+    });
+
+    var Bookshelf = require('bookshelf')(knex);
+
+We need to be able to reuse the same connection throughout our application, make sure it is accessible globally.
+
+
+### Using Bookshelf
+The example that I am going to use to demonstrate how Bookshelf works is that of a blog post. We will create a blog post that includes author, category, and tags metadata.
+
+Firstly, we need to create database tables, let's create a separate file and name it `schema.js`. This file contains the schema for our database tables.
+
+### schema.js
+    var Schema = {
+      users: {
+        id: {type: 'increments', nullable: false, primary: true},
+        email: {type: 'string', maxlength: 254, nullable: false, unique: true},
+        name: {type: 'string', maxlength: 150, nullable: false}
+      },
     
-This took care of creating my project directory and installing all the dependencies required by Express. I'm primarily a PHP developer and I work mostly with Joomla! CMS, I love templates and creating dynamic content. I needed to create a template for my website which has a static footer and header. An Express project contains a Views folder that has 2 files, `layout.jade` and `index.jade`. `Layout.jade` is the main file that other views are rendered on, I modified it to include a footer at the bottom.
-
-### layout.jade
-
-    !!!
-    html
-      head
-        title= title
-        meta(charset='utf-8')
-        meta(name='author', content='Qawelesizwe Mlio')
-        meta(name='description', content='Raging Flame Laboratory - web and software development')
-        link(rel='stylesheet', href='/stylesheets/style.css')
-        link(rel='stylesheet', href='/stylesheets/tipTip.css')
-        script(src='/javascripts/libs/modernizr-2.5.3.min.js')
-      body
-        div.container
-          div.content!= body
-          div.foot!= partial('footer')
-   
-
-Jade is the template engine of my choice and I'm using the partial function to include the `footer.jade` on all views. The footer contains the main navigation for my website and some JavaScript files.
-
-### index.jade
-
-    img(src='/images/rflab.png', style='margin-bottom: 20px;')
-    <strong>about.jade</strong>
-    h1 About Raging Flame Lab
-    p
-      a(href='/', style='margin:0px; padding: 0px; color: #448800;') Home
-      |  :: About
-    p Raging Flame Lab is a Web &amp;amp; Software development studio. We are geeks who love hacking and experimenting with cutting edge technologies.
-    p We are the creators of
-      a(href='http://email2article.com/', target='_blank', style='margin:0px; padding: 0px; font-weight: bold; color: #448800;') email2article
-      | , an app that converts emails to Joomla! CMS articles.
-    br
-    p(style='font-style: italic')
-      | This website is running on
-      a(href='http://nodejs.org/', class='first', target='_blank', style='color: #448800; font-weight: bold; margin: 0px') Node.JS
-      | , a server-side JavaScript environment.
+    
+      categories: {
+        id: {type: 'increments', nullable: false, primary: true},
+        name: {type: 'string', maxlength: 150, nullable: false}
+      },
+    
+      posts: {
+        id: {type: 'increments', nullable: false, primary: true},
+        user_id: {type: 'integer', nullable: false, unsigned: true},
+        category_id: {type: 'integer', nullable: false, unsigned: true},
+        title: {type: 'string', maxlength: 150, nullable: false},
+        slug: {type: 'string', maxlength: 150, nullable: false, unique: true},
+        html: {type: 'text', maxlength: 16777215, fieldtype: 'medium', nullable: false},
+        created_at: {type: 'dateTime', nullable: false},
+        updated_at: {type: 'dateTime', nullable: true}
+      },
       
-The Views are all done, the next step was getting the routing to work so that the home page loaded the `index.jade` file and the `/about` request loaded the `about.jade` file, I edited the `routes/index.js` file.
-
-### routes/index.js
-
-    /*
-     * GET home page.
-     */
-    exports.index = function(req, res){
-        res.render('index', {title: 'Raging Flame Laboratory'})
-    };
- 
-    /*
-     * GET about page.
-     */
-    exports.about = function(req, res){
-        res.render('about', {title: 'Raging Flame Laboratory - About'})
+      
+      tags: {
+        id: {type: 'increments', nullable: false, primary: true},
+        slug: {type: 'string', maxlength: 150, nullable: false, unique: true},
+        name: {type: 'string', maxlength: 150, nullable: false}
+      },
+      
+      
+      posts_tags: {
+        id: {type: 'increments', nullable: false, primary: true},
+        post_id: {type: 'integer', nullable: false, unsigned: true},
+        tag_id: {type: 'integer', nullable: false, unsigned: true}
+      }
     };
     
-Add one line of code to `app.js` that will handle the `/about` request.
+    module.exports = Schema;
 
-    /*
-      below app.get('/', routes.index); add app.get('/about', routes.about);
-    */
-    app.get('/', routes.index);
-    app.get('/about', routes.about);
+
+**Pro Tip:** Promises will save you a lot of time and headaches when dealing with databases in Node, my preferred flavour is [when](https://github.com/cujojs/when). Also install a utility library for doing common tasks, `lodash` is one of the best.
+
+    npm install when lodash --save
+
+We need another file for the code that creates our tables, let's call it `migrate.js`. It requires `knex` so let's copy the code that we wrote earlier and place it at the beginning of the file.
+
+### migrate.js
+I also copied the `createTable` function from the [Ghost](https://github.com/TryGhost/Ghost) project, it accepts a `tableName` string and returns a promise.
+
+    var knex = require('knex')({
+        client: 'mysql',
+        connection: {
+            host     : 'localhost',
+            user     : 'your_database_user',
+            password : 'your_database_password',
+            database : 'myapp_test',
+            charset  : 'utf8'
+      }
+    });
     
-Finito, with that my app is complete, let's fire it up!
+    var Schema = require('./schema');
+    var sequence = require('when/sequence');
+    var _ = require('lodash');
 
-    node app.js
+
+    function createTable(tableName) {
     
-Ok, that works but it blocks the command line from performing other tasks until we kill the current app process, not very helpful. I have used a Node module called forever on my local server to solve this problem, it can run multiple Node servers in the background and restart a server if it crushes. NPM to the rescue:
-
-    npm install -g forever
-    #then start the app with forever
-    forever start app.js
+      return knex.schema.createTable(tableName, function (table) {
     
-To view my app I need to go to port 3000 of my website: `http://mywebsite.com:3000`. This is ok if you are still testing and developing but its not ideal for public access. The recommended way to run Node.js apps in production is by using Nginx as your front-end server that proxies requests to Node.js servers.
-
-Installing Nginx
-
-I have WHM Cpanel installed on my server and I found a tutorial that explained how to install NginxAdmin.
-
-    cd /usr/local/src
-    wget http://nginxcp.com/latest/nginxadmin.tar
-    tar xf nginxadmin.tar
-    cd publicnginx
-    ./nginxinstaller install
- 
-    #Restart apache
-    /etc/init.d/httpd restart
+        var column;
+        var columnKeys = _.keys(Schema[tableName]);
     
-After running this code I got an error that ended with this line: 
-`SyntaxError: 'yield' not allowed in a 'try' block with a 'finally' clause`. 
-To fix it I ran the code below:
-
-    cd /usr/lib/python2.4/site-packages
-    mv PyYAML-3.10-py2.4-linux-x86_64.egg PyYAML-3.10-py2.4-linux-x86_64.egg_
-    wget http://www.booser.com/wp-content/uploads/PyYAML-3.09-py2.4-linux-x86_64.egg
- 
-    #Once this is done run the install command
-    ./nginxinstaller install
+        _.each(columnKeys, function (key) {
+          if (Schema[tableName][key].type === 'text' && Schema[tableName][key].hasOwnProperty('fieldtype')) {
+            column = table[Schema[tableName][key].type](key, Schema[tableName][key].fieldtype);
+          }
+          else if (Schema[tableName][key].type === 'string' && Schema[tableName][key].hasOwnProperty('maxlength')) {
+            column = table[Schema[tableName][key].type](key, Schema[tableName][key].maxlength);
+          }
+          else {
+            column = table[Schema[tableName][key].type](key);
+          }
     
-Nginx installation took care of re-configuring my Apache settings and started handling all requests to my server. A directory with Nginx config files for all my domains was also created and all I had to do was edit the file for my domain to route requests to my Node.js app.
-
-### /etc/nginx/vhosts/rflab.co.za
-
-    # the IP(s) on which your node server is running i choose the port 3000
-    upstream rflab.co.za {
-        server 127.0.0.1:3000;
+          if (Schema[tableName][key].hasOwnProperty('nullable') && Schema[tableName][key].nullable === true) {
+            column.nullable();
+          }
+          else {
+            column.notNullable();
+          }
+    
+          if (Schema[tableName][key].hasOwnProperty('primary') && Schema[tableName][key].primary === true) {
+            column.primary();
+          }
+    
+          if (Schema[tableName][key].hasOwnProperty('unique') && Schema[tableName][key].unique) {
+            column.unique();
+          }
+    
+          if (Schema[tableName][key].hasOwnProperty('unsigned') && Schema[tableName][key].unsigned) {
+            column.unsigned();
+          }
+    
+          if (Schema[tableName][key].hasOwnProperty('references')) {
+            column.references(Schema[tableName][key].references);
+          }
+    
+          if (Schema[tableName][key].hasOwnProperty('defaultTo')) {
+            column.defaultTo(Schema[tableName][key].defaultTo);
+          }
+        });
+      });
     }
- 
-    # the nginx server instance
-    server {
-        listen 41.76.212.119:80;
-        server_name rflab.co.za www.rflab.co.za;
-        access_log /usr/local/apache/domlogs/rflab.co.za-bytes_log bytes_log;
-        access_log /usr/local/apache/domlogs/rflab.co.za combined;
-        root /home/ragingfl/public_html;
-        charset utf-8;
-        error_page 404 /404.html;
- 
-        # pass the request to the node.js server with the correct headers and much more can be added, see nginx config options
-        location / {
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header Host $http_host;
-          proxy_set_header X-NginX-Proxy true;
- 
-          proxy_pass http://rflab.co.za/;
-          proxy_redirect off;
-        }
- 
-        location ~.*\.(3gp|gif|jpg|jpeg|png|ico|wmv|avi|asf|asx|mpg|mpeg|mp4|pls|mp3|mid|wav|swf|flv|html|htm|txt|js|css|exe|zip|tar|rar|gz|tgz|bz2|uha|7z|doc|docx|xls|xlsx|pdf|iso)$ {
-          expires 7d;
-          try_files $uri @backend;
-        }
- 
-        # opt-in to the future
-        add_header &quot;X-UA-Compatible&quot; &quot;IE=Edge,chrome=1&quot;;
-    }
-    
-At the top of the file I inserted the code above and restarted Nginx.
 
-This is only the beginning of my journey in discovering the awesome world of Node.js, please don't hesitate to share your thoughts, opinions and advice. Keep hacking!
+
+    function createTables () {
+      var tables = [];
+      var tableNames = _.keys(Schema);
+    
+      tables = _.map(tableNames, function (tableName) {
+        return function () {
+          return createTable(tableName);
+        };
+      });
+    
+      return sequence(tables);
+    }
+
+
+    createTables()
+    .then(function() {
+      console.log('Tables created!!');
+      process.exit(0);
+    })
+    .otherwise(function (error) {
+      throw error;
+    });
+
+Run the file from the command-line `node migrate`. If everything went well you will see the text `Tables created!!`.
+
+**Another Pro Tip:** [Ghost](https://github.com/TryGhost/Ghost) is an amazing piece of software, its code is clean and well written. When you get stuck with Bookshelf and cannot find an answer on Google, just dig through the code base and look at how Bookshelf is used. I find myself constantly referring to it for solutions.
+
+Now back to `app.js` - I only use Bookshelf in data structures, i.e, in my Models and Collections. Let's go ahead and create a few Models:
+
+    // User model
+    var User = Bookshelf.Model.extend({
+        tableName: 'users'
+    });
+    
+    // Post model
+    var Post = Bookshelf.Model.extend({
+        tableName: 'posts',
+
+        hasTimestamps: true,
+
+        category: function () {
+          return this.belongsTo(Category, 'category_id');
+        },
+
+        tags: function () {
+            return this.belongsToMany(Tag);
+        },
+
+        author: function () {
+            return this.belongsTo(User);
+        }
+    });
+
+    // Category model
+    var Category = Bookshelf.Model.extend({
+    
+        tableName: 'categories',
+    
+        posts: function () {
+           return this.belongsToMany(Post, 'category_id');
+        }
+    });
+
+    // Tag model
+    var Tag = Bookshelf.Model.extend({
+        tableName: 'tags',
+
+        posts: function () {
+           return this.belongsToMany(Post);
+        }
+    });
+
+Bookshelf is heavily influenced by Eloquent ORM and handles one-to-one, one-to-many, and many-to-many associations by defining relationships on Models.
+What is important to know is how Bookshelf handles these relationships under the hood. Let us look at some of the special properties and methods.
+
+### hasTimestamps
+Defining a `hasTimestamps` property in a model and assigning a value of `true` has special effects. Upon creation or when updating, Bookshelf will automatically insert values for the `created_at` and `updated_at` columns.
+
+### hasMany
+The `hasMany` method tells the current model that it has a one-to-many relationship with the model contained in its arguments.
+
+### belongsTo
+The `belongsTo` method  tells the current model that it has a one-to-one or one-to-many relationship with the model contained in its arguments.
+
+### belongsToMany
+The `belongsToMany` method  tells the current model that it has a many-to-many relationship with the model contained in its arguments. This type of a relationship is joined through another table. In our example, the `Post` model has a many-to-many relationship with the `Tags` model. Bookshelf will assume that there is a table named `posts_tags` -  it joins the two table names with an underscore. This is all done under the hood, all you have to do is create the table and Bookshelf will do the rest.
+
+In other relationships Bookshelf assumes that table names are plurals and that the foreignkey is the singular post-fixed with `_id`. It uses the following format:`<TableNameSingular>_id`. In our example,  the `author` method in the `Post` model will be mapped to the `User` model (where the table name is `users`) through the foreignkey `user_id` (substring `user` is the singular of table name `users`).
+
+If your foreignkey and table name do not conform to the above convention you need to specify the foreignkey as a second argument like we did for the relationship between `Posts` and `Categories`.
+
+Phew, hope that makes sense, if not leave a comment.
+
+In the next post we will create a small API that uses our Models. Stay tuned.
+
+### Update
+
+[Checkout the post that uses the Models to create a small API](http://blog.ragingflame.co.za/2014/12/16/building-a-simple-api-with-express-and-bookshelfjs)

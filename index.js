@@ -12,7 +12,7 @@ var mount = st({
     cache: { // specify cache:false to turn off caching entirely
         fd: {
             max: 1000, // number of fd's to hang on to
-            maxAge: 1000*60*60 // amount of ms before fd's expire
+            maxAge: 1000 * 60 * 60 // amount of ms before fd's expire
         },
 
         stat: {
@@ -21,7 +21,7 @@ var mount = st({
         },
 
         content: {
-            max: 1024*1024*64, // how much memory to use on caching contents
+            max: 1024 * 1024 * 64, // how much memory to use on caching contents
             maxAge: 1000 * 60 * 60 * 2,    // set 2 hours to cache contents
             cacheControl: 'public, max-age=600' // to set an explicit cache-control
                                                 // header value
