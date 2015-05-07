@@ -1,0 +1,31 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link href="./css/style.css" rel="stylesheet" />
+</head>
+	<body>
+		<aside>
+			<h1>
+				<a>
+					<img src="<%= index.author.baseUrl %>">
+					</img>
+				</a>
+			</h1>
+			<p class="disc">
+				<%= index.author.description %>
+			</p>
+			<p>
+				<ul>
+					<li><a href="">主页</a></li>
+					<li><a href="">github</a></li>
+					<li><a href="">关于我</a></li>
+				</ul>
+			</p>
+		</aside>
+		<section id="content">
+			<% for(var i=0; i<posts.length; i++){ %>
+					<a href="<%= posts[i].url %>"><%= posts[i].title %></a><%= new Date(posts[i].date)%><br>
+			<% } %>
+        </section>
+	</body>
+</html>

@@ -1,0 +1,37 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <link href="./css/style.css" rel="stylesheet" />
+	<link rel="stylesheet" href="./css/default.css">
+	<script src="./js/highlight.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+</head>
+	<body>
+		<aside>
+			<h1>
+				<a>
+					<img src="<%= index.author.baseUrl %>">
+					</img>
+				</a>
+			</h1>
+			<p class="disc">
+				<%= index.author.description %>
+			</p>
+			<p>
+				<ul>
+					<li><a href="">主页</a></li>
+					<li><a href="">github</a></li>
+					<li><a href="">关于我</a></li>
+				</ul>
+			</p>
+		</aside>
+		<section>
+			<div>
+				<p class="title"><h1><%= post.title %></h1></p>
+				<p class="date"><%= new Date(post.date) %></p>
+			</div>
+			<%- postHtml %>
+        </section>
+	</body>
+</html>

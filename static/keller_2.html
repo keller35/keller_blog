@@ -1,0 +1,80 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <link href="./css/style.css" rel="stylesheet" />
+	<link rel="stylesheet" href="./css/default.css">
+	<script src="./js/highlight.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+</head>
+	<body>
+		<aside>
+			<h1>
+				<a>
+					<img src="./img/keller2.png">
+					</img>
+				</a>
+			</h1>
+			<p class="disc">
+				欢迎来到曾凯明的博客
+			</p>
+			<p>
+				<ul>
+					<li><a href="">主页</a></li>
+					<li><a href="">github</a></li>
+					<li><a href="">关于我</a></li>
+				</ul>
+			</p>
+		</aside>
+		<section>
+			<div>
+				<p class="title"><h1>关于博客</h1></p>
+				<p class="date">Sat Apr 25 2015 15:06:31 GMT+0800 (中国标准时间)</p>
+			</div>
+			<p>一直都想搭一个自己的博客，但是苦于没有行动。这次终于下定决心，动起手来，搭了一个简单的个人博客。</p>
+<h4>关于博客</h4>
+<p>博客主要是用Node.js写的纯静态博客。我的实现方式是：文章先用markdown写好，生成html，再嵌入到整体html框架中，生成静态文件。客户端直接请求静态文件即可。因为个人博客更新频率必定不会很高，我用st在服务端做了静态文件缓存，也在客户端做了缓存策略。关于st模块，可以参考<a href="https://www.npmjs.com/package/st">st module</a>。</p>
+<h4>关于部署</h4>
+<p>工程部署在<a href="https://www.heroku.com/">heroku</a>上，之所以选择heroku，一个原因是heroku是免费的，另一个原因是heroku可以直接支持node，不需要部署node环境。同时，heroku部署还可以通过git直接部署工程，部署非常简单。下面记录一下我的部署过程。</p>
+<p>要使用heroku服务，需要先在heroku注册。</p>
+<p>部署的时候需要下载heroku提供的Heroku Toolbelt工具，通过命令登陆。</p>
+<pre><code>heroku login
+</code></pre>
+<p>cd到自己本地的git仓库，通过以下命令，创建heroku app，同时建立app与git仓库的绑定关系。</p>
+<pre><code>heroku create
+</code></pre>
+<p>推送master至heroku，这样就完成了工程的部署。</p>
+<pre><code>git push heroku master
+</code></pre>
+<p>要启动工程，还需要在工程目录下新建一个<code>Procfile</code>文件，文件内容为<code>web: node index.js</code>,可以看到这是app的启动命令，heroku固定查找这个文件然后执行其中的命令。</p>
+<p>按照官方文档的提示，启动app需要<code>heroku ps:scale web=1</code>命令（暂时不明白这个指令的作用，貌似是heroku提供部署多个工程的机制，所以这里可以进行指定，以后使用到了再进行研究）。</p>
+<p>要访问自己的工程，可以在toolbelt里通过<code>heroku open</code>直接打开浏览器，也可以在登陆heroku官网，在Dashboard查看自己工程的访问地址。</p>
+<h4>关于部署</h4>
+<p>工程部署在<a href="https://www.heroku.com/">heroku</a>上，之所以选择heroku，一个原因是heroku是免费的，另一个原因是heroku可以直接支持node，不需要部署node环境。同时，heroku部署还可以通过git直接部署工程，部署非常简单。下面记录一下我的部署过程。</p>
+<ol>
+<li>
+<p>要使用heroku服务，需要先在heroku注册。</p>
+</li>
+<li>
+<p>部署的时候需要下载heroku提供的Heroku Toolbelt工具，通过<code>heroku login</code>命令登陆。</p>
+</li>
+<li>
+<p>cd到自己本地的git仓库，通过<code>heroku create</code>，创建heroku app，同时建立app与git仓库的绑定关系。</p>
+</li>
+<li>
+<p>最后，通过<code>git push heroku master</code>，推送master至heroku，这样就完成了工程的部署。</p>
+</li>
+<li>
+<p>要启动工程，还需要在工程目录下新建一个<code>Procfile</code>文件，文件内容为<code>web: node index.js</code>,可以看到这是app的启动命令，heroku固定查找这个文件然后执行其中的命令。</p>
+</li>
+<li>
+<p>按照官方文档的提示，启动app需要<code>heroku ps:scale web=1</code>命令（暂时不明白这个指令的作用，貌似是heroku提供部署多个工程的机制，所以这里可以进行指定，以后使用到了再进行研究）。</p>
+</li>
+<li>
+<p>要访问自己的工程，可以在toolbelt里通过<code>heroku open</code>直接打开浏览器，也可以在登陆heroku官网，在Dashboard查看自己工程的访问地址。</p>
+</li>
+</ol>
+
+        </section>
+	</body>
+</html>
