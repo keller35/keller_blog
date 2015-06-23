@@ -1,20 +1,20 @@
 [
   {
-    "id": "keller_1",
-    "title": "test post1",
+    "id": "p1",
+    "title": "关于博客",
     "date": 1429945333047,
-    "description": "keller's first markdown post",
-    "md_file": "/keller_1.md",
-    "html_file": "/keller_1.html",
+    "description": "about keller blog",
+    "md_file": "/about-this-blog.md",
+    "html_file": "/about-this-blog.html",
     "url": "/2015/4/25/keller-1"
   },
   {
-    "id": "keller_2",
-    "title": "关于博客",
+    "id": "p2",
+    "title": "centos部署",
     "date": 1429945591506,
-    "description": "keller's second markdown post",
-    "md_file": "/keller_2.md",
-    "html_file": "/keller_2.html",
+    "description": "about centos deploy",
+    "md_file": "/centos-deploy.md",
+    "html_file": "/centos-deploy.html",
     "url": "/2015/4/25/keller-2"
   }
 ]

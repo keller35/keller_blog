@@ -33,13 +33,17 @@ aside p.disc{
 aside ul{
     list-style: none;
     text-align: center;
-    font: 16px/1.5 'PT Serif', Times, Microsoft YaHei, serif;
+    font: 13px/1.5 'PT Serif', Times, Microsoft YaHei, serif;
 }
 aside ul li a{
     color: #2B3238;
     text-decoration: none !important;
     display: inline-block;
     margin:2px 0 2px 0px;
+}
+aside ul li img{
+    width: 16px;
+    height: 16px;
 }
 aside ul li a:hover{
     color: #BEC7CF;
@@ -58,11 +62,14 @@ section{
     padding-right: 3%;
     font: 16px/1.5 'PT Serif', Times, Microsoft YaHei, serif;
 }
+section #content a{
+    margin-left: 10px;
+}
 section, footer, header, aside{
     display: block;
 }
-section title{
-
+section #title{
+    font: 45px 'Open Sans Condensed', sans-serif;
 }
 code, pre {
     padding: 0 3px 2px;
@@ -79,7 +86,7 @@ code {
     white-space: nowrap;
     background-color: #f4f4f4;
     border: 1px solid #e1e1e8;
-    width: 70%;
+    width: 80%;
 }
 
 pre code {
@@ -102,5 +109,11 @@ pre code {
     section{
         left: 2px;
         width: 92%;
+    }
+    code{
+        width: 95%;
+    }
+    pre code{
+        white-space: pre;
     }
 }

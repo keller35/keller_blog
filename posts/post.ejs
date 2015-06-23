@@ -21,15 +21,14 @@
 			<p>
 				<ul>
 					<li><a href="">主页</a></li>
-					<li><a href="">github</a></li>
-					<li><a href="">关于我</a></li>
+					<li><a href="">github&nbsp;<img src="./img/github.png"/></a></li>
 				</ul>
 			</p>
 		</aside>
 		<section>
 			<div>
-				<p class="title"><h1><%= post.title %></h1></p>
-				<p class="date"><%= new Date(post.date) %></p>
+				<p id="title"><%= post.title %></p>
+				<p class="date"><%= new Date(post.date).toLocaleDateString() %></p>
 			</div>
 			<%- postHtml %>
         </section>
