@@ -6,7 +6,7 @@
     "description": "about keller blog",
     "md_file": "/about-this-blog.md",
     "html_file": "/about-this-blog.html",
-    "url": "/2015/4/25/keller-1"
+    "url": "/about-this-blog.html"
   },
   {
     "id": "p2",
@@ -15,6 +15,6 @@
     "description": "about centos deploy",
     "md_file": "/centos-deploy.md",
     "html_file": "/centos-deploy.html",
-    "url": "/2015/4/25/keller-2"
+    "url": "/centos-deploy.html"
   }
 ]
