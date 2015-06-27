@@ -4,7 +4,7 @@ var st = require('st');
 
 global.appDirname = __dirname;
 
-var PORT = 3050;
+var PORT = process.env.PORT || 5000;
 
 var mount = st({
     path: appDirname + "/static",
