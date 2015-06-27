@@ -49,7 +49,7 @@ var app = connect()
     .use(function(err, req, res, next){
         if(err){
             res.writeHead(500);
-            res.end('server in error');
+            res.end('server is in error');
         }
     });
 http.createServer(app)
