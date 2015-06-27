@@ -2,12 +2,12 @@ var http = require('http');
 var connect = require('connect');
 var st = require('st');
 
-var route = require('./route.js');
+global.appDirname = __dirname;
 
 var PORT = 3050;
 
 var mount = st({
-    path: __dirname + "/static",
+    path: appDirname + "/static",
     url: "/",
     cache: { // specify cache:false to turn off caching entirely
         fd: {
@@ -38,15 +38,20 @@ var mount = st({
         }
     },
 
-    index: true,
+    index: 'index.html',
     dot: true,
-    passthrough: true,
+    passthrough: false,
     gzip: true
 });
 
 var app = connect()
     .use(mount)
-    .use(route);
+    .use(function(err, req, res, next){
+        if(err){
+            res.writeHead(500);
+            res.end('server in error');
+        }
+    });
 http.createServer(app)
     .listen(PORT, function(){
         console.log("server listen on " + PORT);
