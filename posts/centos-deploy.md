@@ -4,6 +4,8 @@ Step 1、
 Step 2、
 安装gcc: yum install gcc gcc-g++ openssl-devel
 
+如果系统没有安装wget工具，可以通过yum -y install wget命令安装
+
 Step 3、下载NodeJS源码包并解压。
 
     [root@BobServerStation local]# wget http://nodejs.org/dist/v0.10.24/node-v0.10.24.tar.gz
