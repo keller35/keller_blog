@@ -98,7 +98,7 @@ pre code {
     white-space: pre-wrap;
 }
 
-@media all and (max-width: 800px){
+@media screen and (max-width: 800px){
     aside{
         margin-left: 0;
         position: static;
