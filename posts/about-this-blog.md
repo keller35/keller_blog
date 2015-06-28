@@ -22,11 +22,13 @@ cd到自己本地的git仓库，通过以下命令，创建heroku app，同时�
 
     git push heroku master
 
-要启动工程，还需要在工程目录下新建一个`Procfile`文件，文件内容为`web: node index.js`,可以看到这是app的启动命令，heroku固定查找这个文件然后执行其中的命令。
+要启动工程，还需要在工程目录下新建一个`Procfile`文件，文件内容为`web: node index.js`,可以看到这是app的启动命令，如果需要可以用`-p $PORT`来设定端口，heroku默认端口是5000，端口变量为process.env.PORT，heroku固定查找这个文件然后执行其中的命令。
 
 按照官方文档的提示，启动app需要`heroku ps:scale web=1`命令（暂时不明白这个指令的作用，貌似是heroku提供部署多个工程的机制，所以这里可以进行指定，以后使用到了再进行研究）。
 
 要访问自己的工程，可以在toolbelt里通过`heroku open`直接打开浏览器，也可以在登陆heroku官网，在Dashboard查看自己工程的访问地址。
+
+查看日志命令是`heroku logs`,查看进程命令是`heroku ps`。
 
 
 #### 关于部署
