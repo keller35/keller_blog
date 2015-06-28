@@ -2,6 +2,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<title><%= index.author.title %></title>
     <link href="./css/style.css" rel="stylesheet" />
     <link href="./css/default.css" rel="stylesheet" />
 </head>
@@ -19,14 +20,23 @@
 			<p>
 				<ul>
 					<li><a href="">主页</a></li>
-					<li><a href="">github&nbsp;<img src="./img/github.png"/></a></li>
-					<li><a href="">关于我</a></li>
+					<li><a href="">github</a></li>
 				</ul>
 			</p>
 		</aside>
 		<section id="content">
+			<h1 id="index_title"><%= index.author.title %></h1>
 			<% for(var i=0; i<posts.length; i++){ %>
-			<%= (function(date){return date.getFullYear()+"/"+date.getMonth()+"/"+date.getDate()})(new Date(posts[i].date))%><a href="<%= posts[i].url %>"><%= posts[i].title %></a><br>
+				<div>
+					<span class="list_time">
+						<%= (function(date){return date.getFullYear()+"/"+date.getMonth()+"/"+date.getDate()})(new Date(posts[i].date))%>
+					</span>
+					<span class="list_title">
+						<a href="<%= posts[i].url %>">
+							<%= posts[i].title %>
+						</a>
+					</span>
+				</div>
 			<% } %>
         </section>
 	</body>

@@ -1,7 +1,8 @@
 {
   "author": {
     "name": "keller",
-    "baseUrl": "./img/keller2.png",
-    "description": "欢迎来到曾凯明的博客"
+    "title": "keller's博客",
+    "baseUrl": "./img/keller.png",
+    "description": "欢迎来到我的博客"
   }
 }
