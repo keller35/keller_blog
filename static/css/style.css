@@ -62,9 +62,13 @@ section{
     padding-right: 3%;
     font: 16px/1.5 'PT Serif', Times, Microsoft YaHei, serif;
 }
-section #content a{
+section a{
     margin-left: 10px;
     text-decoration: none;
+    cursor: auto;
+}
+section a:hover{
+    text-decoration: underline;
 }
 section, footer, header, aside{
     display: block;
@@ -73,9 +77,13 @@ section #title{
     font: 45px 'Open Sans Condensed', sans-serif;
 }
 section #index_title{
-     margin: 30px auto;
-     font: 48px 'Open Sans Condensed', sans-serif;
- }
+    margin-top: 30px;
+    margin-bottom: 40px;
+    font: 48px 'Open Sans Condensed', sans-serif;
+}
+section #index_list{
+    margin-left: 30px;
+}
 code, pre {
     padding: 0 3px 2px;
     font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
@@ -104,11 +112,15 @@ pre code {
 }
 
 span.list_time{
-    margin-right: 20px;
+    margin-right: 10px;
 }
 
 span.list_title{
     margin-left: 20px;
+    font-size: 17px;
+}
+span.list_title a{
+    color: #389dc1;
 }
 
 @media screen and (max-width: 800px){
