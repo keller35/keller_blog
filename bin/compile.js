@@ -1,5 +1,3 @@
-var fs = require('fs');
-var ejs = require('ejs');
 var path = require('path');
 
 global.appDirname = path.join(__dirname, '../');
@@ -12,4 +10,4 @@ function compile(){
     new compilePost().init().render();
 }
 
-compile();
+exports.compile = compile;
