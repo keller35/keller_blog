@@ -33,7 +33,7 @@
 				<% for(var i=0; i<posts.length; i++){ %>
 				<div>
 					<span class="list_time">
-						<%= (function(date){return date.getFullYear()+"/"+date.getMonth()+"/"+date.getDate()})(new Date(posts[i].date))%>
+						<%= new Date(posts[i].date).toLocaleDateString()%>
 					</span>
 					<span class="list_title">
 						<a href="<%= posts[i].url %>">

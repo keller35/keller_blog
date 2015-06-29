@@ -73,7 +73,9 @@ section a:hover{
 section, footer, header, aside{
     display: block;
 }
-section #title{
+section #title {
+    margin-top: 30px;
+    margin-bottom: 20px;
     font: 45px 'Open Sans Condensed', sans-serif;
 }
 section #index_title{
