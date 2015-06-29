@@ -1,3 +1,5 @@
+最近经常在centos上部署生产环境，包括node、nginx、redis和pm2，所以记录一下常用的命令，以便后续需要的时候查看。
+
 Step 1、
 连接： ssh username@ip
 
