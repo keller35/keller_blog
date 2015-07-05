@@ -16,5 +16,14 @@
     "md_file": "/centos-deploy.md",
     "html_file": "/centos-deploy.html",
     "url": "/centos-deploy.html"
+  },
+  {
+    "id": "p3",
+    "title": "redis notification",
+    "date": 1436079362004,
+    "description": "about redis notification",
+    "md_file": "/redis-notification.md",
+    "html_file": "/redis-notification.html",
+    "url": "/redis-notification.html"
   }
 ]
