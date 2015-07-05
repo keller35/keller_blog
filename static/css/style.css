@@ -124,7 +124,24 @@ span.list_title{
 span.list_title a{
     color: #389dc1;
 }
-
+#link{
+    left: 0px;
+    text-align: center;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    font-size: 13px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+#link a{
+    margin-left: 10px;
+    color: #2B3238;
+    text-decoration: none;
+}
+#link a:hover{
+    color: #BEC7CF;
+}
 @media screen and (max-width: 800px){
     aside{
         margin-left: 0;
@@ -133,9 +150,13 @@ span.list_title a{
         padding: 5%;
         text-align: center;
     }
+    #link{
+        background: rgba(100, 101, 102, 0.94);
+    }
     section{
         left: 2px;
         width: 92%;
+        min-height: 500px;
     }
     code{
         width: 95%;

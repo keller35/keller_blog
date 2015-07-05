@@ -13,7 +13,7 @@ compile.prototype.init = function(){
     this.ejs_data.index = require(path.join(appDirname, 'bin/main.json'));
     this.ejs_data.posts = require(path.join(appDirname, 'bin/posts.json'));
     return this;
-}
+};
 
 compile.prototype.render = function(){
     var compiledHtml = ejs.render(this.index_ejs, this.ejs_data);
@@ -23,4 +23,4 @@ compile.prototype.render = function(){
     }catch (error){
         throw error;
     }
-}
+};

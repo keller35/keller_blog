@@ -4,5 +4,11 @@
     "title": "keller's博客",
     "baseUrl": "./img/keller.png",
     "description": "欢迎来到我的博客"
-  }
+  },
+  "links": [
+    {
+      "name":"kyfxbl",
+      "href":"www.kyfxbl.com"
+    }
+  ]
 }
