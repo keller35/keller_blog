@@ -125,14 +125,15 @@ span.list_title a{
     color: #389dc1;
 }
 #link{
-    left: 0px;
-    text-align: center;
-    position: absolute;
     bottom: 0px;
-    width: 100%;
+    /*left: 0px;*/
+    text-align: center;
+    /*bottom: 0px;*/
+    width: 21%;
     font-size: 13px;
     padding-top: 5px;
     padding-bottom: 5px;
+    position: fixed;
 }
 #link a{
     margin-left: 10px;
@@ -151,6 +152,8 @@ span.list_title a{
         text-align: center;
     }
     #link{
+        position: relative;
+        width: 100%;
         background: rgba(100, 101, 102, 0.94);
     }
     section{

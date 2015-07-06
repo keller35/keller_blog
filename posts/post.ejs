@@ -24,14 +24,6 @@
 					<li><a href="">github</a></li>
 				</ul>
 			</p>
-			<div id="link">
-				友情链接:
-				<% for(var i=0; i<index.links.length; i++){ %>
-				<a href="<%= index.links[i].href %>">
-					<%= index.links[i].name %>
-				</a>
-				<% } %>
-			</div>
 		</aside>
 		<section>
 			<div>
@@ -40,5 +32,13 @@
 			</div>
 			<%- postHtml %>
         </section>
+		<div id="link">
+			友情链接:
+			<% for(var i=0; i<index.links.length; i++){ %>
+			<a href="<%= index.links[i].href %>">
+				<%= index.links[i].name %>
+			</a>
+			<% } %>
+		</div>
 	</body>
 </html>
