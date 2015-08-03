@@ -151,10 +151,16 @@ span.list_title a{
         padding: 5%;
         text-align: center;
     }
+    section #index_title{
+        margin: 30px auto;
+        font: 48px 'Open Sans Condensed', sans-serif;
+        text-align: center;
+    }
     #link{
-        position: relative;
-        width: 100%;
-        background: rgba(100, 101, 102, 0.94);
+        display: none;
+        /*position: relative;*/
+        /*width: 100%;*/
+        /*background: rgba(100, 101, 102, 0.94);*/
     }
     section{
         left: 2px;
