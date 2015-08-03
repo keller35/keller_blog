@@ -1,0 +1,94 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <link href="./css/style.css" rel="stylesheet" />
+	<link href="./css/default.css" rel="stylesheet" />
+	<script src="./js/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+</head>
+	<body>
+		<aside>
+			<h1>
+				<a>
+					<img src="./img/keller.png">
+					</img>
+				</a>
+			</h1>
+			<p class="disc">
+				欢迎来到我的博客
+			</p>
+			<p>
+				<ul>
+					<li><a href="">主页</a></li>
+					<li><a href="">github</a></li>
+				</ul>
+			</p>
+		</aside>
+		<section>
+			<div>
+				<p id="title">Vue.js 实践</p>
+				<p id="date">2015-08-03</p>
+			</div>
+			<p>Vue.js实践记录：</p>
+<p><a href="http://cn.vuejs.org/">Vue.js</a> 是一个MVVM框架，由<a href="https://github.com/yyx990803">Evan You</a>大神开发。</p>
+<p>vue类似于angular，但是更加轻便，更专注于ViewModel，上手也更加简单。</p>
+<p>例子:</p>
+<pre><code>&lt;script src=&quot;vue.js&quot;&gt;&lt;/script&gt;
+
+&lt;div id=&quot;demo&quot;&gt;
+    {{message}}
+    &lt;input v-model=&quot;message&quot;&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+    var data = {
+        message: 'Hello Vue.js!'
+    };
+    var vm = new Vue({
+        el: '#demo',
+        data: data
+    });
+&lt;/script&gt;
+</code></pre>
+<p>以上一个简单的example，vue通过实例化Vue对象，可以实现与指定view和model的双向绑定，而Vue对象本身是一个viewmodel。</p>
+<p>Vue实例返回的是一个ViewModel对象，通过这个对象，可以操作这个vm绑定的DOM，即<code>vm.$el</code>；也可以操作这个vm绑定的model，即<code>vm.$data</code>，vm就是双向绑定的中间联系。vm还有很多实例方法，如数据监视，通过<code>vm.$watch()</code>可以监视model的变化，执行监视函数；又如事件通讯，通过<code>vm.emit()</code>可以发布事件，<code>vm.on()</code>可以监听事件。这些方法在开发中都有很使用的地方，具体可见<a href="http://cn.vuejs.org/api/instance-methods.html">文档</a>。</p>
+<p>Vue的model绑定是基于js的GET/SET访问器实现的dependency tracking，按照vue作者的话说会比angular的dirty checking效率高，但是使用的时候就会有一些限制。</p>
+<p><code>vm.$data</code>指向的是model，但其实这个model对象已经跟实例化的时候指定的model有了一些变化，vue自动为model增加了SET/GET访问器，所以这也是vue双向绑定的原理。因为有了SET/GET访问器,model上的变化，通过访问器触发了view的变化，也就达到了双向绑定的目的。也正是因为这样，下面的例子不能达到双向绑定的效果。</p>
+<pre><code>&lt;script src=&quot;vue.js&quot;&gt;&lt;/script&gt;
+
+&lt;div id=&quot;demo&quot;&gt;
+    {{message}}
+    &lt;input v-model=&quot;message&quot;&gt;
+    {{key}}
+    &lt;input v-model=&quot;key&quot;&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+    var data = {
+        message: 'Hello Vue.js!'
+    };
+    var vm = new Vue({
+        el: '#demo',
+        data: data
+    });
+    setTimeout(function(){
+        data.key = &quot;value&quot;;
+    }, 1000);
+&lt;/script&gt;
+</code></pre>
+<p>这是因为新增的属性没有SET/GET访问器，属性的变化将不会触发view层的更新。所以vue提供了<code>vm.$add()</code>方法来支持新增属性，删除属性的话也可以使用<code>vm.$delete</code>方法。</p>
+<p>Vue的指令功能也很强大，类似于angular的指令，主要是用于view层的操作。</p>
+<p>同时，vue提供了组件系统，可以扩展vue，封装自己的组件达到复用的目的。因为这一块实践较少，后续补上。</p>
+
+        </section>
+		<div id="link">
+			友情链接:
+			
+			<a href="www.kyfxbl.com">
+				kyfxbl
+			</a>
+			
+		</div>
+	</body>
+</html>

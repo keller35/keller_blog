@@ -20,7 +20,7 @@ vue类似于angular，但是更加轻便，更专注于ViewModel，上手也更�
   		var vm = new Vue({
     		el: '#demo',
     		data: data
-  		})
+  		});
 	</script>
 	
 以上一个简单的example，vue通过实例化Vue对象，可以实现与指定view和model的双向绑定，而Vue对象本身是一个viewmodel。

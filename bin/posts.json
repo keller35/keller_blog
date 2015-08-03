@@ -25,5 +25,14 @@
     "md_file": "/redis-notification.md",
     "html_file": "/redis-notification.html",
     "url": "/redis-notification.html"
+  },
+  {
+    "id": "p4",
+    "title": "Vue.js 实践",
+    "date": 1438610945657,
+    "description": "about Vue.js practice",
+    "md_file": "/vue-practice.md",
+    "html_file": "/vue-practice.html",
+    "url": "/vue-practice.html"
   }
 ]
