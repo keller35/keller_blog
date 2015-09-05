@@ -11,7 +11,7 @@ gulp-mocha的功能主要是完成自动化的mocha测试，对于测试结果�
 
 下面是具体实例：
 
-![gulp](../img/gulp1.png)
+![post](../img/gulp1.png)
 
 index.js是待测试代码：
 
@@ -65,11 +65,11 @@ gulp.src函数读取要执行的脚本文件，通过stream的方式pipe进行�
 
 运行	gulp 命令后目录结构如下：
 
-![gulp](../img/gulp2.png)
+![post](../img/gulp2.png)
 
 coverage.html就是测试报告，长这样：
 
-![gulp](../img/reporter.png)
+![post](../img/reporter.png)
 
 100% coverage , hah !!!
 

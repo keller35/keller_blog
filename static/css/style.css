@@ -4,6 +4,10 @@
 body{
     /*font: Microsoft YaHei;*/
 }
+img[alt="post"]{
+    max-width: 50%;
+    max-height: 50%;
+}
 /*------------------------
     aside
 -----------------------------*/

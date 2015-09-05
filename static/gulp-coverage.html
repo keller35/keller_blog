@@ -2,14 +2,10 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<title>gulp coverage</title>
+	<link href="./img/keller.ico" rel="shortcut icon" type="image/x-icon">
     <link href="./css/style.css" rel="stylesheet" />
 	<link href="./css/default.css" rel="stylesheet" />
-	<style>
-		img[alt="gulp"]{
-			max-width: 50%;
-			max-height: 50%;
-		}
-	</style>
 	<script src="./js/highlight.min.js"></script>
 	<script>hljs.initHighlightingOnLoad();</script>
 </head>
@@ -45,7 +41,7 @@
 </ul>
 <p>gulp-mocha的功能主要是完成自动化的mocha测试，对于测试结果，使用gulp-coverage可以生成比较直观的测试结果报告。</p>
 <p>下面是具体实例：</p>
-<p><img src="../img/gulp1.png" alt="gulp"></p>
+<p><img src="../img/gulp1.png" alt="post"></p>
 <p>index.js是待测试代码：</p>
 <pre><code>/*
 * index.js
@@ -92,9 +88,9 @@ gulp.task('default', ['mocha']);
 <p>gulp配置了两个任务(task)，默认任务调用了'mocha'任务，而'mocha'任务主要就是利用前面提到的两个插件完成测试和生成报告的作用。</p>
 <p>gulp.src函数读取要执行的脚本文件，通过stream的方式pipe进行数据传递，cover.instrument必须在所有操作之前调用，中间调用mocha，而cover.gather和cover.format则必须在测试脚本执行后调用。cover.instrument有两个参数，pattern指定被测试的源文件的目录，debugDirectory指定生成测试资源（文档的原话是&quot;This is useful for debugging gulp-coverage itself&quot;,对使用貌似没有用处）。最后用gulp.dest指定测试报告生成目录即可。</p>
 <p>运行  gulp 命令后目录结构如下：</p>
-<p><img src="../img/gulp2.png" alt="gulp"></p>
+<p><img src="../img/gulp2.png" alt="post"></p>
 <p>coverage.html就是测试报告，长这样：</p>
-<p><img src="../img/reporter.png" alt="gulp"></p>
+<p><img src="../img/reporter.png" alt="post"></p>
 <p>100% coverage , hah !!!</p>
 
         </section>
