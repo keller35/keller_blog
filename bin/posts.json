@@ -43,5 +43,14 @@
     "md_file": "/gulp-coverage.md",
     "html_file": "/gulp-coverage.html",
     "url": "/gulp-coverage.html"
+  },
+  {
+    "id": "p6",
+    "title": "函数柯里化 & ramdajs",
+    "date": 1441380679452,
+    "description": "about currying and ramdajs",
+    "md_file": "/currying.md",
+    "html_file": "/currying.html",
+    "url": "/currying.html"
   }
 ]

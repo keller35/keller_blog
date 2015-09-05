@@ -1,0 +1,181 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <link href="./css/style.css" rel="stylesheet" />
+	<link href="./css/default.css" rel="stylesheet" />
+	<script src="./js/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+</head>
+	<body>
+		<aside>
+			<h1>
+				<a>
+					<img src="./img/keller.png">
+					</img>
+				</a>
+			</h1>
+			<p class="disc">
+				欢迎来到我的博客
+			</p>
+			<p>
+				<ul>
+					<li><a href="https://kellerblog.herokuapp.com/">主页</a></li>
+					<li><a href="https://github.com/keller35">github</a></li>
+				</ul>
+			</p>
+		</aside>
+		<section>
+			<div>
+				<p id="title">函数柯里化 &amp; ramdajs</p>
+				<p id="date">2015-09-04</p>
+			</div>
+			<h1>柯里化</h1>
+<p>柯里化是指把接收多个参数的函数变换成接收单个参数，最后返回接收余下参数的函数的技术。我的理解就是将原本的函数的部分参数固定，返回一个接收子集参数的函数，也就是这个函数是原本参数的子函数。</p>
+<p>Talk is cheap,show me the code!</p>
+<p>1、一个例子：</p>
+<p>有函数如下：</p>
+<pre><code>function add(a, b){
+    return a + b;
+}
+</code></pre>
+<p>以上函数就是简单的加法函数，如果我们的需求是获取一个求取任何数加上5的函数，显然这是此加法函数的子集，于是我们可以将此函数柯里化如下：</p>
+<pre><code>function add5(b){
+    return add(5, b);
+}
+</code></pre>
+<p>柯里化后的函数只接收余下的一个参数，通过调用原有函数，返回结果，这就是函数的柯里化。</p>
+<p>把以上柯里化的方法抽象出来，就是如下的curry函数：</p>
+<pre><code>function curry(fn) {
+    var slice = Array.prototype.slice,
+    //截取固定参数
+    __args = slice.call(arguments, 1);
+    return function () {
+        //截取非固定参数
+        var __inargs = slice.call(arguments);
+        //合并参数，实际调用
+        return fn.apply(null, __args.concat(__inargs));
+    };
+}
+</code></pre>
+<p>使用这个通用函数来柯里化add函数如下：</p>
+<pre><code>var add5 = curry(add, 5);
+</code></pre>
+<p>那么，我们可以直接使用<code>add5(6)</code>求5+6的值。</p>
+<p>2、又一个例子：</p>
+<p>将原来的add函数升级为三个参数相加：</p>
+<pre><code>function add(a, b, c){
+    return a + b + c;
+}
+</code></pre>
+<p>使用curry函数进行柯里化：</p>
+<pre><code>var add5 = curry(add, 5);
+</code></pre>
+<p>那么，我们可以使用<code>add5(6, 7)</code>求的5+6+7的值</p>
+<p>再进一步柯里化：</p>
+<pre><code>var add5and6 = curry(add, 5, 6);
+</code></pre>
+<p><code>add5and6(7)</code>就是求值5+6+7。</p>
+<p>3、自动柯里化</p>
+<p>可以看出，如果需要封装柯里化的函数，都需要从原始函数开始进行封装。所以需要寻找一种可以实现逐层封装的方法，即在<code>add5</code>的基础上通过<code>var add5and6 = add5(6)</code>封装出<code>add5and6</code>。</p>
+<p>所以，以下是一个更通用的柯里化函数：</p>
+<pre><code>function currying(fn, length) {
+    length = length || fn.length;
+    return function () {
+        if (arguments.length &lt; length) {
+            var combined = [fn].concat(toArray(arguments));
+            return length - arguments.length &gt; 0
+            ? curry(curry.apply(this, combined), length - arguments.length)
+            : curry.call(this, combined );
+        } else {
+            return fn.apply(this, arguments);
+        }
+    };
+}
+</code></pre>
+<p>这个curring是对原有curry函数的升级，它对于传入的参数个数进行判断，如果参数个数未达到原函数的个数，则继续进行函数柯里化，也就是不断返回子集函数，直到参数达到求值个数。这也称为“自动柯里化”。</p>
+<p>有了currying函数，柯里化变得更加简单:</p>
+<pre><code>//自动柯里化表现为链式调用
+//实际传值在最后进行
+var c_add5and6 = currying(add)(5)(6);
+var result = c_add5and6(7);
+</code></pre>
+<p>4、柯里化的优势：</p>
+<p>a、提高适用性：柯里化就是通过组合简单的函数来实现可以在专一条件下使用的函数。当然，提高了适用性，也就拒绝了通用性。</p>
+<p>b、惰性求值：通过链式调用，可以进行柯里化封装，但是最终结果运算会直到达到参数个数才会进行。这样可以避免中间运算，从而保证代码性能。</p>
+<h1>Ramdajs</h1>
+<p><a href="https://github.com/ramda/ramda">Ramdajs</a>是一个api库，他提供了数据操作的api，类似于underscore，但是Ramdajs所有api都实现了自动柯里化，所以使用起来更加优雅，相对于underscore性能也会更好。</p>
+<p>以下是一些Ramdajs的例子：</p>
+<pre><code>var R = require('ramda');
+
+R.add(2, 3);        //=&gt;  5
+R.add(2)(3);        //=&gt;  5
+
+//自动柯里化
+R.equals(1, 1);     //=&gt; true
+R.equals(1)(1);     //=&gt; true
+
+//函数参数也可以柯里化
+var double = function(x) {
+    return x * 2;
+};
+R.map(double, [1, 2, 3]); //=&gt; [2, 4, 6]
+R.map(double)([1, 2, 3]); //=&gt; [2, 4, 6]
+</code></pre>
+<p>underscore与ramda的对比：</p>
+<pre><code>//按age排列数据，然后格式化输出
+
+var _ = require('underscore');
+var R = require('ramda');
+
+var data = [{
+    name: 'a',
+    age: 20
+}, {
+    name: 'b',
+    age: 22
+}, {
+    name: 'c',
+    age: 24
+}, {
+    name: 'd',
+    age: 18
+}];
+
+//underscore的实现
+//参数需要最先传入，难以复用
+//value ==&gt; [ 'd is 18', 'a is 20', 'b is 22', 'c is 24' ]  
+var value = _.chain(data)
+    .sortBy(function (person) {
+        return person.age;
+    }).map(function (person) {
+        return person.name + &quot; is &quot; + person.age;
+    }).value();
+
+
+//ramda的实现
+//可封装出适用函数，参数为最后传入
+//传入最终值才会进行求值，否则返回柯里化函数
+//value ==&gt; [ 'd is 18', 'a is 20', 'b is 22', 'c is 24' ]
+var sortByAgeFormat = R.compose(R.map(function (person) {
+    return person.name + &quot; is &quot; + person.age;
+}), R.sortBy(R.prop('age')));
+var value = sortByAgeFormat(data);
+</code></pre>
+<p>更多api可以查看<a href="http://ramdajs.com/docs/">ramda api</a></p>
+<p>===</p>
+<p>参考资料：</p>
+<p>http://fr.umio.us/why-ramda/</p>
+<p>http://blog.jobbole.com/77956/</p>
+
+        </section>
+		<div id="link">
+			友情链接:
+			
+			<a href="http://www.kyfxbl.com">
+				kyfxbl
+			</a>
+			
+		</div>
+	</body>
+</html>
