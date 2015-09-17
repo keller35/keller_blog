@@ -4,7 +4,7 @@
     "title": "keller's博客",
     "baseUrl": "./img/keller.png",
     "description": "欢迎来到我的博客",
-    "index": "https://kellerblog.herokuapp.com/",
+    "index": "/",
     "github": "https://github.com/keller35",
     "links": "/links.html"
   },
