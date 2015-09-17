@@ -177,4 +177,8 @@ span.list_title a{
     pre code{
         white-space: pre;
     }
+    /* 手机上隐藏多说分享 */
+    #ds-share{
+        display: none;
+    }
 }
