@@ -5,7 +5,8 @@
     "baseUrl": "./img/keller.png",
     "description": "欢迎来到我的博客",
     "index": "https://kellerblog.herokuapp.com/",
-    "github": "https://github.com/keller35"
+    "github": "https://github.com/keller35",
+    "links": "/links.html"
   },
   "links": [
     {

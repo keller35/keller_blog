@@ -5,7 +5,9 @@
 	<title><%= index.author.title %></title>
 	<link href="./img/keller.ico" rel="shortcut icon" type="image/x-icon">
     <link href="./css/style.css" rel="stylesheet" />
-    <link href="./css/default.css" rel="stylesheet" />
+	<link href="./css/default.css" rel="stylesheet" />
+	<script src="./js/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
 </head>
 	<body>
 		<aside>
@@ -26,24 +28,14 @@
 				</ul>
 			</p>
 		</aside>
-		<section id="content">
-			<h1 id="index_title">
-				<%= index.author.title %>
-			</h1>
-			<div id="index_list">
-				<% for(var i=0; i<posts.length; i++){ %>
-				<div>
-					<span class="list_time">
-						<%= new Date(posts[i].date).toLocaleDateString()%>
-					</span>
-					<span class="list_title">
-						<a href="<%= posts[i].url %>">
-							<%= posts[i].title %>
-						</a>
-					</span>
-				</div>
+		<section>
+			<ul>
+				<% for(var i=0; i<index.links.length; i++){ %>
+				<a href="<%= index.links[i].href %>">
+					<%= index.links[i].name %>
+				</a>
 				<% } %>
-			</div>
+			</ul>
         </section>
 	</body>
 </html>

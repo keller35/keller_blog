@@ -24,6 +24,7 @@
 				<ul>
 					<li><a href="<%= index.author.index %>">主页</a></li>
 					<li><a href="<%= index.author.github %>">github</a></li>
+					<li><a href="<%= index.author.links %>">links</a></li>
 				</ul>
 			</p>
 		</aside>
@@ -61,13 +62,5 @@
 			<!-- 多说公共JS代码 end -->
 
         </section>
-		<div id="link">
-			友情链接:
-			<% for(var i=0; i<index.links.length; i++){ %>
-			<a href="<%= index.links[i].href %>">
-				<%= index.links[i].name %>
-			</a>
-			<% } %>
-		</div>
 	</body>
 </html>
