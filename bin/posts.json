@@ -52,5 +52,14 @@
     "md_file": "/currying.md",
     "html_file": "/currying.html",
     "url": "/currying.html"
+  },
+  {
+    "id": "p7",
+    "title": "使用自己的域名",
+    "date": 1442500838405,
+    "description": "使用自己的域名",
+    "md_file": "/add-my-domains.md",
+    "html_file": "/add-my-domains.html",
+    "url": "/add-my-domains.html"
   }
 ]

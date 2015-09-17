@@ -1,0 +1,78 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<title>使用自己的域名</title>
+	<link href="./img/keller.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="./css/style.css" rel="stylesheet" />
+	<link href="./css/default.css" rel="stylesheet" />
+	<script src="./js/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+</head>
+	<body>
+		<aside>
+			<h1>
+				<a>
+					<img src="./img/keller.png">
+					</img>
+				</a>
+			</h1>
+			<p class="disc">
+				欢迎来到我的博客
+			</p>
+			<p>
+				<ul>
+					<li><a href="https://kellerblog.herokuapp.com/">主页</a></li>
+					<li><a href="https://github.com/keller35">github</a></li>
+					<li><a href="/links.html">links</a></li>
+				</ul>
+			</p>
+		</aside>
+		<section>
+			<div>
+				<p id="title">使用自己的域名</p>
+				<p id="date">2015-09-17</p>
+			</div>
+			<p>今天申请了域名，通过对域名的配置，顺便了解了一下cdn的配置和工作原理。</p>
+<p>因为博客部署在heroku上，所以原本已经有了一个域名：kellerblog.heroku.com，是在heroku创建应用时生成的域名。这个自己申请的域名是www.kellerblog.cc，所以要在cdn上将两个域名绑定，访问后者就会映射到前者。</p>
+<p>cdn映射一般有一下几种情况：</p>
+<ul>
+<li>A记录解析：就是将域名映射到ip上</li>
+<li>CNAME解析：这次我配置的就是CNAME解析，就是将域名映射到域名上</li>
+<li>MX记录解析：作为邮箱解析使用，指向的是邮箱地址服务器地址</li>
+</ul>
+<p>cdn还有TTL设置，TTL的单位是秒，通常不小于200s，TTL(Time-To-Live)，就是一条域名解析记录在DNS服务器中的存留时间。当各地的DNS服务器接受到解析请求时，就会向域名指定的NS服务器发出解析请求从而获得解析记录；在获得这个记录之后，记录会在DNS服务器中保存一段时间，这段时间内如果再接到这个域名的解析请求，DNS服务器将不再向NS服务器发出请求，而是直接返回刚才获得的记录；而这个记录在DNS服务器上保留的时间，就是TTL值。</p>
+<p>然而在配置的时候出现了一些问题，我配置了www.kellerblog.cc到kellerblog.heroku.com域名的映射之后，使用<code>host www.kellerblog.com</code>命令查看主机名，发现映射地址是正确的，但是查看网页，访问到的地址确实是heroku，但heroku却提示app not found。</p>
+<p>后来查看<a href="https://devcenter.heroku.com/articles/custom-domains">文档</a>，发现heroku内部还需要做一步操作，需要通过<code>heroku domains:add www.kellerblog.cc</code>添加域名，这里似乎是heroku内部的cdn操作。</p>
+<p>完成这些，于是终于可以用上自己的域名啦!</p>
+
+
+			<!-- 多说评论框 start -->
+			<div class="ds-thread flat" data-thread-key="p7" data-title="使用自己的域名" data-url="/add-my-domains.html"></div>
+			<!-- 多说评论框 end -->
+			<!-- 多说分享 start -->
+			<div class="ds-share flat" data-thread-key="p7" data-title="使用自己的域名" data-images="/img/keller.png" data-content="使用自己的域名" data-url="/add-my-domains.html">
+				<div class="ds-share-aside-right">
+					<div class="ds-share-aside-inner">
+					</div>
+					<div class="ds-share-aside-toggle">分享到</div>
+				</div>
+			</div>
+			<!-- 多说分享 end -->
+			<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+			<script type="text/javascript">
+				var duoshuoQuery = {short_name:"kellerblog"};
+				(function() {
+					var ds = document.createElement('script');
+					ds.type = 'text/javascript';ds.async = true;
+					ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+					ds.charset = 'UTF-8';
+					(document.getElementsByTagName('head')[0]
+					|| document.getElementsByTagName('body')[0]).appendChild(ds);
+				})();
+			</script>
+			<!-- 多说公共JS代码 end -->
+
+        </section>
+	</body>
+</html>
