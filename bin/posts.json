@@ -61,5 +61,14 @@
     "md_file": "/add-my-domains.md",
     "html_file": "/add-my-domains.html",
     "url": "/add-my-domains.html"
+  },
+  {
+    "id": "p8",
+    "title": "Angular学习笔记（一）",
+    "date": 1442916582841,
+    "description": "Angular学习笔记之directive",
+    "md_file": "/angular-note-1.md",
+    "html_file": "/angular-note-1.html",
+    "url": "/angular-note-1.html"
   }
 ]
