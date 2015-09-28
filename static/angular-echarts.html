@@ -1,0 +1,183 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<title>使用angular封装echarts</title>
+	<link href="./img/keller.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="./css/style.css" rel="stylesheet" />
+	<link href="./css/default.css" rel="stylesheet" />
+	<script src="./js/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+</head>
+	<body>
+		<aside>
+			<h1>
+				<a>
+					<img src="./img/keller.png">
+					</img>
+				</a>
+			</h1>
+			<p class="disc">
+				欢迎来到我的博客
+			</p>
+			<p>
+				<ul>
+					<li><a href="/">主页</a></li>
+					<li><a href="https://github.com/keller35">github</a></li>
+					<li><a href="/links.html">links</a></li>
+				</ul>
+			</p>
+		</aside>
+		<section>
+			<div>
+				<p id="title">使用angular封装echarts</p>
+				<p id="date">2015-09-28</p>
+			</div>
+			<p>Echarts是一个开源的图表组件，图表比较丰富，工作中需要用到它来搭建一个数据展示系统。但是系统原有的框架是基于angular的，而echarts是基于原生js的，如果直接使用的话就丢失了angular双向绑定的优势，而且后续代码不好维护，所以需要将echarts封装成一个通用的angular组件。</p>
+<p>echarts原生实现如下：</p>
+<pre><code>&lt;!-- 为ECharts准备一个具备大小（宽高）的Dom --&gt;
+&lt;div id=&quot;main&quot; style=&quot;height:400px&quot;&gt;&lt;/div&gt;
+&lt;!-- ECharts单文件引入 --&gt;
+&lt;script src=&quot;http://echarts.baidu.com/build/dist/echarts-all.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+    // 基于准备好的dom，初始化echarts图表
+    var myChart = echarts.init(document.getElementById('main')); 
+    
+    var option = {
+        tooltip: {
+            show: true
+        },
+        legend: {
+            data:['销量']
+        },
+        xAxis : [
+            {
+                type : 'category',
+                data : [&quot;衬衫&quot;,&quot;羊毛衫&quot;,&quot;雪纺衫&quot;,&quot;裤子&quot;,&quot;高跟鞋&quot;,&quot;袜子&quot;]
+            }
+        ],
+        yAxis : [
+            {
+                type : 'value'
+            }
+        ],
+        series : [
+            {
+                &quot;name&quot;:&quot;销量&quot;,
+                &quot;type&quot;:&quot;bar&quot;,
+                &quot;data&quot;:[5, 20, 40, 10, 10, 20]
+            }
+        ]
+    };
+
+    // 为echarts对象加载数据 
+    myChart.setOption(option); 
+&lt;/script&gt;
+</code></pre>
+<p>echarts的使用比较简单，只要提供一个DOM容器，通过js提供的echarts对象进行初始化就可以，而初始化参数option是一个js对象，可以说echarts是基于配置的。</p>
+<p>那么依照这个思路，通过angular封装出来的指令，只需要提供一个数据配置接口即可实现图表的展示，而且可以实现数据与视图的双向banding，使用只需要通过修改数据来获得图表的刷新。</p>
+<p>所以自定义directive如下：</p>
+<pre><code>angular.module('app', []).directive('eChart', [function () {
+
+        function link($scope, element, attrs) {
+
+            // 基于准备好的dom，初始化echarts图表
+            var myChart = echarts.init(element[0]);
+
+            //监听options变化
+            if (attrs.uiOptions) {
+                attrs.$observe('uiOptions', function () {
+                    var options = $scope.$eval(attrs.uiOptions);
+                    if (angular.isObject(options)) {
+                        myChart.setOption(options);
+                    }
+                }, true);
+            }
+
+        }
+
+        return {
+            restrict: 'A',
+            link: link
+        };
+    }]).controller('pieController', ['$scope', function ($scope) {
+
+        function initData() {
+            var arr = [];
+            for (var i = 0; i &lt; 6; i++) {
+                arr.push(parseInt(Math.random() * 100));
+            }
+            return arr;
+        }
+
+        var data = initData();
+        console.log(data);
+        $scope.data = data;
+
+        $scope.changData = function () {
+            var data = initData();
+            console.log(data);
+            $scope.data = data;
+        }
+
+    }]);
+</code></pre>
+<p>这里提供了attribute式的directive，只要在dom标签中声明了<code>e-chart</code>属性，angular将会使用echarts初始化这个dom结构，而初始化的参数就是directive声明中的另外一个属性<code>ui-options</code>。所以，在controller中，只需要将配置参数绑定在$scope上，然后在dom结构中将这个参数赋值给<code>ui-options</code>即可实现初始化，后续需要更新图表则直接修改$scope上的参数即可。</p>
+<p>html结构如下：</p>
+<pre><code>&lt;div class=&quot;col-xs-12&quot; ng-controller=&quot;pieController&quot;&gt;
+    &lt;button ng-click=&quot;changData()&quot;&gt;click me&lt;/button&gt;
+    &lt;div e-chart ui-options=&quot;{tooltip: {show: true},
+    legend: {
+        data: ['销量']
+    },
+    xAxis: [
+        {
+            type: 'category',
+            data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+    }
+    ],
+    yAxis: [
+    {
+    type: 'value'
+    }
+    ],
+    series: [
+    {
+    'name': '销量',
+    'type': 'bar',
+    'data': {{data}}
+    }
+    ]}&quot; style=&quot;height: 400px;width: 100%;&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+
+
+			<!-- 多说评论框 start -->
+			<div class="ds-thread flat" data-thread-key="p9" data-title="使用angular封装echarts" data-url="/angular-echarts.html"></div>
+			<!-- 多说评论框 end -->
+			<!-- 多说分享 start -->
+			<div class="ds-share flat" data-thread-key="p9" data-title="使用angular封装echarts" data-images="/img/keller.png" data-content="使用angular封装echarts" data-url="/angular-echarts.html">
+				<div class="ds-share-aside-right">
+					<div class="ds-share-aside-inner">
+					</div>
+					<div class="ds-share-aside-toggle">分享到</div>
+				</div>
+			</div>
+			<!-- 多说分享 end -->
+			<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+			<script type="text/javascript">
+				var duoshuoQuery = {short_name:"kellerblog"};
+				(function() {
+					var ds = document.createElement('script');
+					ds.type = 'text/javascript';ds.async = true;
+					ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+					ds.charset = 'UTF-8';
+					(document.getElementsByTagName('head')[0]
+					|| document.getElementsByTagName('body')[0]).appendChild(ds);
+				})();
+			</script>
+			<!-- 多说公共JS代码 end -->
+
+        </section>
+	</body>
+</html>

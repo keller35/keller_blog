@@ -70,5 +70,14 @@
     "md_file": "/angular-note-1.md",
     "html_file": "/angular-note-1.html",
     "url": "/angular-note-1.html"
+  },
+  {
+    "id": "p9",
+    "title": "使用angular封装echarts",
+    "date": 1443429777813,
+    "description": "使用angular封装echarts",
+    "md_file": "/angular-echarts.md",
+    "html_file": "/angular-echarts.html",
+    "url": "/angular-echarts.html"
   }
 ]
