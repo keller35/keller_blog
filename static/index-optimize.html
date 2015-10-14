@@ -1,0 +1,90 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<title>记一次sql优化</title>
+	<link href="./img/keller.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="./css/style.css" rel="stylesheet" />
+	<link href="./css/default.css" rel="stylesheet" />
+	<script src="./js/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+</head>
+	<body>
+		<aside>
+			<h1>
+				<a>
+					<img src="./img/keller.png">
+					</img>
+				</a>
+			</h1>
+			<p class="disc">
+				欢迎来到我的博客
+			</p>
+			<p>
+				<ul>
+					<li><a href="/">主页</a></li>
+					<li><a href="https://github.com/keller35">github</a></li>
+					<li><a href="/links.html">links</a></li>
+				</ul>
+			</p>
+		</aside>
+		<section>
+			<div>
+				<p id="title">记一次sql优化</p>
+				<p id="date">2015-10-14</p>
+			</div>
+			<p>最近在做一个数据统计系统，需要对生产环境产生的数据进行统计和分析，最后在前端生成图表信息。</p>
+<p>在执行一条sql的时候，发现执行速度很慢，在测试数据库就需要二十秒。</p>
+<p>sql对两个表进行了连接，还进行了分组，sql大概是这个样子的：</p>
+<pre><code>select a.title 'title',count(b.id) 'count'
+from a left join b on a.id = b.a_id and b.type = 1
+group by a.id
+order by a.create_date desc
+limit 0,20
+</code></pre>
+<p>于是查询sql的执行计划如下：</p>
+<p><img src="../img/index-optimize1.png" alt="post"></p>
+<p>可以看到sql的执行顺序是：</p>
+<p>1、表a进行了ALL全表扫描，这里key显示为null，所以表a的主键索引没有被用到。
+using temporary和using filesort说明mysql先对表a进行了group by和order by，因为连接是left join，所以先group by也不会影响最后的结果集。</p>
+<p>2、表b也进行了ALL全表扫描。过滤表b后进行表连接操作，这里使用的是using join buffer。</p>
+<p>所以进行优化步骤如下：</p>
+<p>1、可以看到这里先对表b进行了using where过滤，扫描了520843行，这已经是全表扫描了。所以为了减少表b的扫描数，可以对表b的连接字段a_id建立索引。</p>
+<p>索引建立后的执行计划如下：</p>
+<p><img src="../img/index-optimize2.png" alt="post"></p>
+<p>优化后表a和表b都利用了索引index2,所以表b也不需要进行ALL全表扫描，sql执行速度提高了很多，基本只要一秒的时间。</p>
+<p>2、因为连接的时候还有另外一个<code>b.type = 1</code>的条件，所以建立表b的<code>a_id</code>和<code>type</code>的联合索引</p>
+<p>索引修改后的执行计划如下：</p>
+<p><img src="../img/index-optimize3.png" alt="post"></p>
+<p>优化后的执行计划，ref字段显示连接的条件中的a_id和type被充分利用，这是一个最优解的情况。</p>
+
+
+			<!-- 多说评论框 start -->
+			<div class="ds-thread flat" data-thread-key="p10" data-title="记一次sql优化" data-url="/index-optimize.html"></div>
+			<!-- 多说评论框 end -->
+			<!-- 多说分享 start -->
+			<div class="ds-share flat" data-thread-key="p10" data-title="记一次sql优化" data-images="/img/keller.png" data-content="记一次sql优化" data-url="/index-optimize.html">
+				<div class="ds-share-aside-right">
+					<div class="ds-share-aside-inner">
+					</div>
+					<div class="ds-share-aside-toggle">分享到</div>
+				</div>
+			</div>
+			<!-- 多说分享 end -->
+			<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+			<script type="text/javascript">
+				var duoshuoQuery = {short_name:"kellerblog"};
+				(function() {
+					var ds = document.createElement('script');
+					ds.type = 'text/javascript';ds.async = true;
+					ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+					ds.charset = 'UTF-8';
+					(document.getElementsByTagName('head')[0]
+					|| document.getElementsByTagName('body')[0]).appendChild(ds);
+				})();
+			</script>
+			<!-- 多说公共JS代码 end -->
+
+        </section>
+	</body>
+</html>
