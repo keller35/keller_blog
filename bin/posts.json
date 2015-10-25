@@ -88,5 +88,14 @@
     "md_file": "/index-optimize.md",
     "html_file": "/index-optimize.html",
     "url": "/index-optimize.html"
+  },
+  {
+    "id": "p11",
+    "title": "《高性能MySQL》-索引笔记",
+    "date": 1445787679804,
+    "description": "高性能MySQL-索引笔记",
+    "md_file": "/HPMYSQL-index.md",
+    "html_file": "/HPMYSQL-index.html",
+    "url": "/HPMYSQL-index.html"
   }
 ]

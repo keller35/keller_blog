@@ -1,0 +1,91 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<title>《高性能MySQL》-索引笔记</title>
+	<link href="./img/keller.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="./css/style.css" rel="stylesheet" />
+	<link href="./css/default.css" rel="stylesheet" />
+	<script src="./js/highlight.min.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+</head>
+	<body>
+		<aside>
+			<h1>
+				<a>
+					<img src="./img/keller.png">
+					</img>
+				</a>
+			</h1>
+			<p class="disc">
+				欢迎来到我的博客
+			</p>
+			<p>
+				<ul>
+					<li><a href="/">主页</a></li>
+					<li><a href="https://github.com/keller35">github</a></li>
+					<li><a href="/links.html">links</a></li>
+				</ul>
+			</p>
+		</aside>
+		<section>
+			<div>
+				<p id="title">《高性能MySQL》-索引笔记</p>
+				<p id="date">2015-10-25</p>
+			</div>
+			<p>最近在读《高性能MySQL》，把“创建高性能索引”一章的重点做了一下笔记：</p>
+<h3>B树索引：</h3>
+<p>使用B+TREE实现</p>
+<h3>哈希索引：</h3>
+<p>基于哈希表实现，保存通过索引键计算出的哈希码和指向每个数据行的指针</p>
+<h3>索引优点：</h3>
+<p>1、减少扫描的数据量；</p>
+<p>2、避免排序和临时表；</p>
+<p>3、将随机IO变成顺序IO；</p>
+<h3>高性能索引策略：</h3>
+<p>以下索引策略值针对B-TREE索引：</p>
+<p>1、简化where字句，使用独立的列，避免列成为表达式内容的一部分（列成为函数的参数），应该将列作为表达式的一侧。
+例如：需要使用索引，可以将<code>a + 1 &lt; 5</code>改成<code>a &lt; 5 - 1</code></p>
+<p>2、索引会占用空间，所以尽可能减少索引的列。</p>
+<p>3、对于索引的列，索引的不重复性越高，查询效率越高。
+不重复性是指不重复的索引值/记录总数。
+因为如果某个字段重复性过高，使用索引的效率与全表查询的效率相差不大，也就体现不出索引的优势。</p>
+<p>4、将常用的列置于索引前缀，提高索引的利用率。</p>
+<p>5、对于BLOB、TEXT或者较长的varchar类型的列，必须使用前缀索引，因为MySQL不允许索引这些列的完整长度。
+而对于前缀的长度，需要保证前缀的不重复性跟列不重复性接近。
+例如：对于city字段，可以只索引改字段的前n个值，只要这前n个值的不重复性与原值的不重复性基本相等即可。</p>
+<p>6、BTREE索引中，如果出现范围查询（like查询），则索引中范围查询后的列不能使用到索引。</p>
+<h3>排序：</h3>
+<p>1、只有当索引的列顺序和order by字句的顺序完全一致，并且所有列的排序方向完全一致，才能使用索引来对结果进行排序。</p>
+<p>2、如果查询关联的是多个表时，只有当order by的字段全部为第一个表时（在explain中显示的作为第一个执行的表），才能使用索引进行排序，而且需要满足最左前缀。</p>
+
+
+			<!-- 多说评论框 start -->
+			<div class="ds-thread flat" data-thread-key="p11" data-title="《高性能MySQL》-索引笔记" data-url="/HPMYSQL-index.html"></div>
+			<!-- 多说评论框 end -->
+			<!-- 多说分享 start -->
+			<div class="ds-share flat" data-thread-key="p11" data-title="《高性能MySQL》-索引笔记" data-images="/img/keller.png" data-content="高性能MySQL-索引笔记" data-url="/HPMYSQL-index.html">
+				<div class="ds-share-aside-right">
+					<div class="ds-share-aside-inner">
+					</div>
+					<div class="ds-share-aside-toggle">分享到</div>
+				</div>
+			</div>
+			<!-- 多说分享 end -->
+			<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+			<script type="text/javascript">
+				var duoshuoQuery = {short_name:"kellerblog"};
+				(function() {
+					var ds = document.createElement('script');
+					ds.type = 'text/javascript';ds.async = true;
+					ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+					ds.charset = 'UTF-8';
+					(document.getElementsByTagName('head')[0]
+					|| document.getElementsByTagName('body')[0]).appendChild(ds);
+				})();
+			</script>
+			<!-- 多说公共JS代码 end -->
+
+        </section>
+	</body>
+</html>
