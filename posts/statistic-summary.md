@@ -1,0 +1,103 @@
+数据统计系统总结
+
+最近一段时间开发了公司一款产品的数据统计系统，主要是对产品产生的数据进行收集，按照不同维度进行统计后，在前台利用图表的形式展示出来。
+这次开发的过程中也遇到了一些有意思的问题，所以在这片博文中就记录一下本次开发的“心路历程”~
+
+### 0、背景
+
+后端使用node.js，数据库使用MySQL；前端使用angular和bootstrap。
+
+### 1、后台接口的数据格式
+
+因为前端获取数据都是通过Ajax的形式请求的，所以后端响应使用的是json格式。
+
+在代码开发过程中，为了能够实现代码复用，我尽可能的将数据控制为统一的格式，这样前端对数据的解析就可以使用同一套代码。
+
+在这其中，主要由两种固定的数据形式：
+
+1）指标、指标值的形式：将键值对封装成一个json，多个键值对形成数组
+
+	[
+        {
+          "key": "aaa",
+          "value": 111
+        },
+        {
+          "key": "bbb",
+          "value": 222
+        }
+    ]
+    
+2）多组数据形式：将多组数据全部封装到一个json，前端不同业务数据都从这个json中读取
+
+    {
+        totalCount: 9999,
+        details: [
+            {
+                time: "20150101",
+                count: 100
+            }
+            ...
+        ],
+        appDetails: [],
+        wechatDetails: []
+    }
+    
+### 2、前端数据格式化工具
+
+因为后端数据格式基本是固定的，所以我在前端开发了一个`utilsService`对象，这个对象作为一个angular的服务，可以注入到各个controller中，
+这样就可以在各个controller中使用通用的数据格式化工具。
+
+    angular.module('app.utilsService', [])
+        .factory('utilsService', function(){
+        
+        return {
+            ...
+        };
+    }
+    
+`utilsService`服务中有一个功能是对日期进行补全。
+
+之所以要对接口数据中的日期进行补全，是因为后端MySQL对日期进行分组的时候，只会对存在的日期进行分组，这样就导致数据中的日期中可能出现缺失，
+而图表又要求日期必须是连续的，这样就需要对日期进行补全。
+
+而不在后端进行补全操作是因为担心这样的IO操作影响node的性能，毕竟单进程嘛，所以放在客户端应该是较好的选择。
+
+### 3、angular directive的封装
+
+原生echarts是基于DOM操作的，所以既然选择使用angular，再对DOM进行操作总感觉不妥，而且很难利用双向绑定的优势，所以将echarts封装成directive是最好的选择。
+
+    angular.module('ui.echarts', [])
+        .directive('eChart', [function () {
+        
+        function link(){
+        
+            // 基于准备好的dom，初始化echarts图表
+            var myChart = echarts.init(element[0]);
+    
+            //监听options变化
+            if (attrs.uiOptions) {
+                attrs.$observe('uiOptions', function () {
+                    var options = $scope.$eval(attrs.uiOptions);
+                    if (angular.isObject(options)) {
+                        myChart.setOption(options, true);
+                    }
+                }, true);
+            }
+        }
+        
+        return {
+            restrict: 'A',
+            link: link
+        };
+    }
+    
+这里也只是实现了最简单的封装：初始化图表和监听参数。[代码](https://github.com/keller35/Angular-ECharts)
+
+系统使用的另外一个开源组件angular ui-select，内部的封装更加复杂。
+angular directive使用起来给人的感觉是特别繁琐，概念太多，不过封装一个通用性很高的directive本身就是一项复杂的工作。
+
+### 4、sql优化
+
+limit
+索引
