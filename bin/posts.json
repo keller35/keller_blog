@@ -97,5 +97,14 @@
     "md_file": "/HPMYSQL-index.md",
     "html_file": "/HPMYSQL-index.html",
     "url": "/HPMYSQL-index.html"
+  },
+  {
+    "id": "p12",
+    "title": "数据统计系统开发总结",
+    "date": 1445911578726,
+    "description": "数据统计系统开发总结",
+    "md_file": "/statistic-summary.md",
+    "html_file": "/statistic-summary.html",
+    "url": "/statistic-summary.html"
   }
 ]
