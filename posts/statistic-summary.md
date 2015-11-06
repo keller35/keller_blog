@@ -28,7 +28,8 @@
         }
     ]
     
-2）多组数据形式：将多组数据全部封装到一个json，前端不同业务数据都从这个json中读取
+2）多组数据形式：将多组数据全部封装到一个json，前端不同业务数据都从这个json中读取。
+（因为在前端，单页面内多个相似的业务是同时请求数据的，所以把相似的业务请求统一为一个请求，可以减小http请求开销）
 
     {
         totalCount: 9999,
@@ -45,7 +46,7 @@
     
 ### 2、前端数据格式化工具
 
-因为后端数据格式基本是固定的，所以我在前端开发了一个`utilsService`对象，这个对象作为一个angular的服务，可以注入到各个controller中，
+因为后端数据格式基本是固定的，所以我在前端开发了一个`utilsService`的对象，这个对象作为一个angular的服务，可以注入到各个controller中，
 这样就可以在各个controller中使用通用的数据格式化工具。
 
     angular.module('app.utilsService', [])
@@ -65,8 +66,9 @@
 
 ### 3、angular directive的封装
 
-原生echarts是基于DOM操作的，所以既然选择使用angular，再对DOM进行操作总感觉不妥，而且很难利用双向绑定的优势，所以将echarts封装成directive是最好的选择。
+系统图表的展示我选择的是baidu出品的echarts，但是原生echarts是基于DOM操作的，所以既然选择使用angular，再对DOM进行操作总感觉不妥，而且很难利用双向绑定的优势，所以将echarts封装成directive是最好的选择。
 
+    //directive代码
     angular.module('ui.echarts', [])
         .directive('eChart', [function () {
         
@@ -92,7 +94,33 @@
         };
     }
     
-这里也只是实现了最简单的封装：初始化图表和监听参数。[代码](https://github.com/keller35/Angular-ECharts)
+    //html代码
+    <div e-chart ui-options="{tooltip: {show: true},
+        legend: {
+            data: ['销量']
+        },
+        xAxis: [
+            {
+                type: 'category',
+                data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+        }
+        ],
+        yAxis: [
+        {
+        type: 'value'
+        }
+        ],
+        series: [
+        {
+        'name': '销量',
+        'type': 'bar',
+        'data': {{data}}
+        }
+        ]}" style="height: 400px;width: 100%;">
+    </div>
+    
+这里也只是实现了最简单的封装：根据参数`ui-options`初始化图表，然后监听此参数，如果参数变化，将重新绘制图表。
+于是在业务中，我的主要变化是参数中`data`的改变，我通过控制`data`就可以控制图表，也就达到了双向绑定的目的。[代码](https://github.com/keller35/Angular-ECharts)
 
 系统使用的另外一个开源组件angular ui-select，内部的封装更加复杂。
 angular directive使用起来给人的感觉是特别繁琐，概念太多，不过封装一个通用性很高的directive本身就是一项复杂的工作。
@@ -104,6 +132,8 @@ angular directive使用起来给人的感觉是特别繁琐，概念太多，不
 首先测试所有sql的执行时间，挑选慢sql进行优化。对慢sql进行explain，对于where条件，如果type显示为ALL而且rows数很多，显然需要进行索引优化了。
 
 因为最左前缀原则的限制，索引列的选择优先考虑当前慢sql的优化，如果可以的话再考虑其他sql。
+
+比如有如下sql的explain：
 
     explain
     select a.id 'aid',b.id 'bid' 
@@ -120,11 +150,13 @@ angular directive使用起来给人的感觉是特别繁琐，概念太多，不
     +------+------+-----------------------------------------------------------------+
     | ref  | rows | Extra                                                           |
     +------+------+-----------------------------------------------------------------+
-    | NULL |  325 | Using where                                                     |
+    | NULL | 8869 | Using where                                                     |
     | NULL | 8522 | Using where; Using index; Using join buffer (Block Nested Loop) |
     +------+------+-----------------------------------------------------------------+
+    
+一个简单的join和where，但是a表进行了全表扫描，效率很低。
 
-这里为表a创建索引idx_id_type(c_id, type),索引后explain如下，表b扫描行数仅剩2行：
+这里为表a创建索引idx_id_type(c_id, type),索引后再explain如下，因为直接查询索引，表a扫描行数仅剩2行：
 
     +----+-------------+-------+-------+---------------+-------------+---------+
     | id | select_type | table | type  | possible_keys | key         | key_len |
