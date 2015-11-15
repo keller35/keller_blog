@@ -43,7 +43,7 @@
 </ul>
 <p>cdn还有TTL设置，TTL的单位是秒，通常不小于200s，TTL(Time-To-Live)，就是一条域名解析记录在DNS服务器中的存留时间。当各地的DNS服务器接受到解析请求时，就会向域名指定的NS服务器发出解析请求从而获得解析记录；在获得这个记录之后，记录会在DNS服务器中保存一段时间，这段时间内如果再接到这个域名的解析请求，DNS服务器将不再向NS服务器发出请求，而是直接返回刚才获得的记录；而这个记录在DNS服务器上保留的时间，就是TTL值。</p>
 <p>然而在配置的时候出现了一些问题，我配置了www.kellerblog.cc到kellerblog.heroku.com域名的映射之后，使用<code>host www.kellerblog.com</code>命令查看主机名，发现映射地址是正确的，但是查看网页，访问到的地址确实是heroku，但heroku却提示app not found。</p>
-<p>后来查看<a href="https://devcenter.heroku.com/articles/custom-domains">文档</a>，发现heroku内部还需要做一步操作，需要通过<code>heroku domains:add www.kellerblog.cc</code>添加域名，这里似乎是heroku内部的cdn操作。</p>
+<p>后来查看<a href="https://devcenter.heroku.com/articles/custom-domains">文档</a>，发现heroku内部还需要做一步操作，需要通过<code>heroku domains:add www.kellerblog.cc</code>添加域名，这里似乎是heroku内部的DNS操作。</p>
 <p>完成这些，于是终于可以用上自己的域名啦!</p>
 
 

@@ -12,6 +12,6 @@ cdn还有TTL设置，TTL的单位是秒，通常不小于200s，TTL(Time-To-Live
 
 然而在配置的时候出现了一些问题，我配置了www.kellerblog.cc到kellerblog.heroku.com域名的映射之后，使用`host www.kellerblog.com`命令查看主机名，发现映射地址是正确的，但是查看网页，访问到的地址确实是heroku，但heroku却提示app not found。
 
-后来查看[文档](https://devcenter.heroku.com/articles/custom-domains)，发现heroku内部还需要做一步操作，需要通过`heroku domains:add www.kellerblog.cc`添加域名，这里似乎是heroku内部的cdn操作。
+后来查看[文档](https://devcenter.heroku.com/articles/custom-domains)，发现heroku内部还需要做一步操作，需要通过`heroku domains:add www.kellerblog.cc`添加域名，这里似乎是heroku内部的DNS操作。
 
 完成这些，于是终于可以用上自己的域名啦!
