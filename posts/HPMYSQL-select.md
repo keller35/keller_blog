@@ -99,3 +99,32 @@ MySQL的关联查询：
           可以写成
            (select * from a limit 20) union all (select * from b limit 20) limit 20
           减少查询数量
+          
+MIN()和MAX()查询优化：
+
+     mysql的对于MIN()的优化做的不好，所以可以使用limit 1替代
+     
+特殊查询的优化：
+
+     同时统计互斥的分类条件：
+          select SUM(IF(color = ‘blue’, 1, 0)) as blue,SUM(IF(color = ‘blue’, 1, 0)) as red from mytable
+          或
+          select COUNT(color = ‘blue’ or null) as blue,COUNT(color = ’red’ or null) as red from mytable
+
+优化关联查询：
+
+     当表A关联表B时，如果优化器的关联顺序是B、A，那么就不需要在表B上建立索引。
+     （这里是因为对于表B，表A经过索引筛选后直接）？
+
+group by 优化
+
+     group by结果集会自动按照分组的字段进行排序，如果不关心结果集顺序，
+     而这种排序又导致了需要进行文件排序，则可以使用order by null让MySQL不再进行排序。
+
+limit 优化：
+
+     当OFFSET偏移量大的时候，limit的性能会降低，这时可以进行优化：
+          如果数据本身是有顺序的，可以这样进行优化：
+          select * from table where a < offset limit 20
+          如果数据是无序的，可以这样优化：
+          select * from table a inner join (select id from table order by id limit 20) b on a.id = b.id

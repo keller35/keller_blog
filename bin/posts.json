@@ -109,11 +109,11 @@
   },
   {
     "id": "p13",
-    "title": "《高性能MySQL》-查询性能优化笔记（一）",
+    "title": "《高性能MySQL》-查询性能优化笔记",
     "date": 1447569931246,
-    "description": "《高性能MySQL》-查询性能优化笔记1",
-    "md_file": "/HPMYSQL-select-1.md",
-    "html_file": "/HPMYSQL-select-1.html",
-    "url": "/HPMYSQL-select-1.html"
+    "description": "《高性能MySQL》-查询性能优化笔记",
+    "md_file": "/HPMYSQL-select.md",
+    "html_file": "/HPMYSQL-select.html",
+    "url": "/HPMYSQL-select.html"
   }
 ]
