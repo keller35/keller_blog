@@ -124,5 +124,14 @@
     "md_file": "/angular-unit-test.md",
     "html_file": "/angular-unit-test.html",
     "url": "/angular-unit-test.html"
+  },
+  {
+    "id": "p15",
+    "title": "js对象的原型和属性",
+    "date": 1449373174000,
+    "description": "js对象的原型和属性",
+    "md_file": "/js-prototype-property.md",
+    "html_file": "/js-prototype-property.html",
+    "url": "/js-prototype-property.html"
   }
 ]

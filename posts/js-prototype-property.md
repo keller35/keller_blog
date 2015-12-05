@@ -1,7 +1,7 @@
 javascript是面向对象语言，除了基本数据类型，其他所有数据类型都是对象类型。
 而对象由属性组成，属性描述了一个对象的状态，所以了解对象的继承方式和属性特性是了解js面向对象的基础。
 
-## 问题
+## 一、问题
 
 首先看一段简单代码：
 
@@ -18,17 +18,21 @@ javascript是面向对象语言，除了基本数据类型，其他所有数据�
         console.log(key + ":" + obj[key]);
     }
     
-这里创建了一个简单对象obj，调用obj的toString函数，输出了对象信息。
+这里创建了一个对象obj，调用obj的toString函数，输出了对象信息。
 然后遍历对象属性，输出了定义对象时创建的属性num。
 
 那么这里就有两个问题：
 
-    1、为什么对象会有toString函数？
-    2、既然对象有toString函数，为什么在for/in遍历时却不能获取这个函数？
+    1、为什么对象会有toString函数属性？
+    2、既然对象有toString函数属性，为什么在for/in遍历时却不能获取这个属性？
     
-要理解这个问题，首先要知道js对象的创建方式。
+要理解这个问题，首先要知道js对象的继承方式。
 
-## 创建对象的三种方式
+## 二、继承
+
+要了解js对象的继承方式，需要先了解js对象创建的方式。
+
+### 创建对象的三种方式
 
 js创建对象的有三种方式：
 
@@ -54,7 +58,7 @@ js创建对象的有三种方式：
 
 那么以上三种创建对象的方式有什么区别？他们对继承有什么影响？下面将做介绍。
 
-## 继承
+### 继承
 
 js不同于基于类的面向对象语言，它的继承是基于原型的。
 js中的每个对象，在其内部都会有一个内部链接指向另一个对象，这个对象就是原型对象，一般简称原型。
@@ -106,11 +110,11 @@ Object.getPrototypeOf显示对象o的原型为Object。（在一些js环境下�
 
 至于另一个问题，则需要往下看。
 
-## 属性的类型
+## 三、属性
 
-在js中，对象的属性有两种：数据属性和存储器属性
+在js中，对象的属性有两种：数据属性和存储器属性。
 
-数据属性和存储器属性有什么区别呢？看看两种属性的特性就知道了。
+数据属性和存储器属性有什么区别呢？属性是有特性的，他们的区别看看两种属性的特性就知道了。
 
 数据属性的特性包括：
 
@@ -126,6 +130,87 @@ Object.getPrototypeOf显示对象o的原型为Object。（在一些js环境下�
     enumerable:可枚举性
     configurable:可配置性
     
-两种属性都有通用的特性就是：enumerable和configurable，
+数据属性的value特性定义了属性的值，它可以是任何javascript值，默认是undefined；
+当writable为true时，属性值才能被运算符改变。
+    
+    var o = {};
+    Object.defineProperty(o, "num", {
+        value: 1,
+        writable: false
+    });
+    o.num = 2;
+    console.log(o); //{num:1}
+    
+这里对象o的num属性为writable为false，所以修改num属性无效，属性值还是保持初始化的值。
+在ES5的严格模式下，对non-writable进行修改将会报错。
 
-## 属性的特性
+存储器属性的set、get特性分别为属性提供了setter和getter方法，
+setter方法接受一个唯一参数，将该参数分配给属性；
+getter方法返回一个值，这个值就被当做该属性的值。
+
+    "use strict";
+    function Obj(){
+        var num = null;
+        Object.defineProperty(this, "num", {
+            set: function (newVal) {
+                console.log("set!!");
+                num = newVal;
+            },
+            get: function () {
+                console.log("get!!");
+                return ++num;
+            },
+            enumerable: true
+        });
+    }
+    
+    var o = new Obj();
+    //  set!!
+    o.num = 1;
+    //  get!!
+    //  2
+    console.log(o.num);
+    //  get!!
+    //  3
+    console.log(o.num);
+  
+这里为属性num设置了setter/getter方法，所以在设置和获取属性值时都会调用setter/getter方法。
+
+两种属性都有通用的特性就是：enumerable和configurable。
+enumerable属性定义了对象的属性是否可以在 for/in 循环和 Object.keys() 中被枚举；
+configurable 特性表示对象的属性是否可以被删除，以及除 writable 特性外的其他特性是否可以被修改；
+
+    "use strict";
+    
+    var o = {};
+    Object.defineProperty(o, "num", {
+        value: 1,
+        writable: true,
+        enumerable: false,
+        configurable: false
+    });
+    
+    //  {}
+    console.log(o);
+    
+    //  1
+    console.log(o.num);
+    
+    //  TypeError: Cannot delete property 'num' of #<Object>
+    delete o.num;
+
+看到这里可以明白，数据属性和存储器属性最大的区别就是setter/getter的区别。
+存储器增加了对于属性值的操作，可以实现很多实用的功能。
+
+回到问题：“既然对象有toString函数，为什么在for/in遍历时却不能获取这个函数？”
+那么只要看看toString函数的描述符就可以了。
+
+    Object.getOwnPropertyDescriptor(Object.prototype, "toString")
+    
+    { value: [Function: toString],
+      writable: true,
+      enumerable: false,
+      configurable: true }
+      
+toString函数是Objct.prototype的属性，enumerable为false所以不可以在 for/in 循环中被枚举。
+继承Object.prototype的对象自然也继承了toString函数，所以其toString函数也不可以被枚举。
