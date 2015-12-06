@@ -1,0 +1,245 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<title>js对象的原型和属性</title>
+	<link href="./img/keller.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="./css/style.css" rel="stylesheet" />
+	<link href="./css/zenburn.css" rel="stylesheet" />
+	<script src="./js/highlight.pack.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+</head>
+	<body>
+		<aside>
+			<h1>
+				<a>
+					<img src="./img/keller.png">
+					</img>
+				</a>
+			</h1>
+			<p class="disc">
+				欢迎来到我的博客
+			</p>
+			<p>
+				<ul>
+					<li><a href="/">主页</a></li>
+					<li><a href="https://github.com/keller35">github</a></li>
+					<li><a href="/links.html">links</a></li>
+				</ul>
+			</p>
+		</aside>
+		<section>
+			<div>
+				<p id="title">js对象的原型和属性</p>
+				<p id="date">2015-12-06</p>
+			</div>
+			<p>Javascript是面向对象语言，除了基本数据类型，其他所有数据类型都是对象类型。
+而对象由属性组成，属性描述了一个对象的状态，所以了解对象的继承方式和属性特性是了解js面向对象的基础。</p>
+<h2>一、问题</h2>
+<p>首先看一段简单代码：</p>
+<pre><code>// 创建对象
+var obj = {num: 1};
+
+// 调用对象的toString
+// [object Object]
+obj.toString();    
+
+// 遍历对象属性
+// num:1
+for(var key in obj){
+    console.log(key + &quot;:&quot; + obj[key]);
+}
+</code></pre>
+<p>这里创建了一个对象obj，调用obj的toString函数，输出了对象信息。
+然后遍历对象属性，输出了定义对象时创建的属性num。</p>
+<p>那么这里就有两个问题：</p>
+<pre><code>1、为什么对象会有toString函数属性？
+2、既然对象有toString函数属性，为什么在for/in遍历时却不能获取这个属性？
+</code></pre>
+<p>要理解这个问题，首先要知道js对象的继承方式。</p>
+<h2>二、继承</h2>
+<p>要了解js对象的继承方式，需要先了解js对象创建的方式。</p>
+<h3>创建对象的三种方式</h3>
+<p>1、对象直接量</p>
+<pre><code>var o = {};
+</code></pre>
+<p>这是最简单的创建对象的方式，通过对象直接量创建对象</p>
+<p>2、Object.create()</p>
+<pre><code>var o = Object.create({});
+</code></pre>
+<p>通过Object的静态函数create创建对象</p>
+<p>3、构造函数</p>
+<pre><code>function Obj(){}
+var o = new Obj();
+</code></pre>
+<p>通过构造函数创建对象</p>
+<p>那么以上三种创建对象的方式有什么区别？他们对继承有什么影响？下面将做介绍。</p>
+<h3>继承</h3>
+<p>js不同于基于类的面向对象语言，它的继承是基于原型的。
+js中的每个对象，在其内部都会有一个内部链接指向另一个对象，这个对象就是原型对象，一般简称原型。
+而被引用的原型内部，也会有一个连接指向另一个对象，以此推类，形成原型链。
+最终所有对象的原型链都会指向Object.prototype，而Object.prototype的原型为null，也就是原型链的终点。</p>
+<p>查看原型的方法：</p>
+<pre><code>var o = {};
+Object.getPrototypeOf(o);   //Object
+</code></pre>
+<p>Object.getPrototypeOf显示对象o的原型为Object。
+（在一些js环境下，可以通过对象的一个<code>__proto__</code>属性获取原型，不过这不是ES的规范，所以不推荐使用）</p>
+<p>回到上面三种创建对象的方式，我们可以查看他们的原型：</p>
+<pre><code>var o;
+
+o = {};
+Object.getPrototypeOf(o);   //Object
+
+o = Object.create({num: 1});
+Object.getPrototypeOf(o);   //Object {num: 1}
+
+function Obj(){}
+o = new Obj();
+Object.getPrototypeOf(o);   //Obj {}
+
+Obj.prototype.num = 1;
+o = new Obj();
+Object.getPrototypeOf(o);   //Obj {num: 1}
+</code></pre>
+<p>可以看到，通过直接量创建的对象，其内部原型链接指向的就是Object.prototype。
+通过Object.create创建的对象，其内部原型链接指向的就是函数中的参数。
+通过构造函数创建的对象，其内部原型链接指向的就是构造函数的prototype。</p>
+<p>为什么通过直接量和create函数创建的对象原型不是Object，而是Object.prototype？
+这就是跟js的原型继承方式有关，对象之间的继承方式是通过原型继承，也就是继承关系是在对象与对象之间进行的。
+而Object是什么，是构造函数，构造函数是标识对象创建方式的。
+这里有个图可以帮助理解。</p>
+<p><img src="../img/prototype.png" alt="prototype"></p>
+<p>可以看到，对象只继承自原型！！！</p>
+<p>构造函数的prototype属性指向的是原型，而原型对象中的一个叫constructor的属性指向的是构造函数。
+这里的关系就是说：继承关系是在对象之间进行的，但是定义继承关系的是构造函数。
+如果把构造函数的原型属性改为指向其他对象，那么通过这个构造函数创建的对象也将继承自新的原型对象。</p>
+<p>讲到这里，也就解决了第一个问题。
+通过对象直接量创建的对象，它继承自Object.prototype，而Object.prototype定义了很多函数，其中就包括toString。
+所以，我们创建的对象也就继承了toString函数。</p>
+<p>至于另一个问题，则需要往下看。</p>
+<h2>三、属性</h2>
+<p>在js中，对象的属性有两种：数据属性和存储器属性。</p>
+<p>数据属性和存储器属性有什么区别呢？属性是有特性的，他们的区别看看两种属性的特性就知道了。</p>
+<p>数据属性的特性包括：</p>
+<pre><code>value:属性值
+writable:可写性
+enumerable:可枚举性
+configurable:可配置性
+</code></pre>
+<p>存储器属性的特性包括：</p>
+<pre><code>set
+get
+enumerable:可枚举性
+configurable:可配置性
+</code></pre>
+<p>数据属性的value特性定义了属性的值，它可以是任何javascript值，默认是undefined；
+writable定义了属性的可写性，当writable为true时，属性值才能被运算符改变。</p>
+<p>存储器属性的set、get特性分别为属性提供了setter和getter方法，
+setter方法接受一个唯一参数，将该参数分配给属性；
+getter方法返回一个值，这个值就被当做该属性的值。</p>
+<p>两种属性都有通用的特性就是：enumerable和configurable。
+enumerable属性定义了对象的属性是否可以在 for/in 循环和 Object.keys() 中被枚举；
+configurable 特性表示对象的属性是否可以被删除，以及除 writable 特性外的其他特性是否可以被修改；</p>
+<p>更多关于属性的介绍可以点击<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty">这里</a></p>
+<p>属性特性的定义可以通过object.defineProperty这个函数：</p>
+<pre><code>var o = {};
+Object.defineProperty(o, &quot;num&quot;, {
+    value: 1,
+    writable: false
+});
+o.num = 2;
+console.log(o); //{num:1}
+</code></pre>
+<p>这里对象o的num属性为writable为false，所以修改num属性无效，属性值还是保持初始化的值。
+在ES5的严格模式下，对non-writable进行修改将会报错。</p>
+<pre><code>&quot;use strict&quot;;
+function Obj(){
+    var num = null;
+    Object.defineProperty(this, &quot;num&quot;, {
+        set: function (newVal) {
+            console.log(&quot;set!!&quot;);
+            num = newVal;
+        },
+        get: function () {
+            console.log(&quot;get!!&quot;);
+            return ++num;
+        },
+        enumerable: true
+    });
+}
+
+var o = new Obj();
+//  set!!
+o.num = 1;
+//  get!!
+//  2
+console.log(o.num);
+//  get!!
+//  3
+console.log(o.num);
+</code></pre>
+<p>这里为属性num设置了setter/getter方法，所以在设置和获取属性值时都会调用setter/getter方法。</p>
+<pre><code>&quot;use strict&quot;;
+
+var o = {};
+Object.defineProperty(o, &quot;num&quot;, {
+    value: 1,
+    writable: true,
+    enumerable: false,
+    configurable: false
+});
+
+//  {}
+console.log(o);
+
+//  1
+console.log(o.num);
+
+//  TypeError: Cannot delete property 'num' of #&lt;Object&gt;
+delete o.num;
+</code></pre>
+<p>看到这里可以明白，数据属性和存储器属性最大的区别就是setter/getter的区别。
+存储器增加了对于属性值的操作，可以实现很多实用的功能。</p>
+<p>回到问题：“既然对象有toString函数，为什么在for/in遍历时却不能获取这个函数？”
+那么只要看看toString函数的描述符就可以了。</p>
+<pre><code>Object.getOwnPropertyDescriptor(Object.prototype, &quot;toString&quot;)
+
+{ value: [Function: toString],
+  writable: true,
+  enumerable: false,
+  configurable: true }
+</code></pre>
+<p>toString函数是Objct.prototype的属性，之所以不可以在 for/in 循环中被枚举就是因为enumerable为false。
+继承Object.prototype的对象自然也继承了toString函数和其特性，所以其toString函数也不可以被枚举。</p>
+
+
+			<!-- 多说评论框 start -->
+			<div class="ds-thread flat" data-thread-key="p15" data-title="js对象的原型和属性" data-url="/js-prototype-property.html"></div>
+			<!-- 多说评论框 end -->
+			<!-- 多说分享 start -->
+			<div class="ds-share flat" data-thread-key="p15" data-title="js对象的原型和属性" data-images="/img/keller.png" data-content="js对象的原型和属性" data-url="/js-prototype-property.html">
+				<div class="ds-share-aside-right">
+					<div class="ds-share-aside-inner">
+					</div>
+					<div class="ds-share-aside-toggle">分享到</div>
+				</div>
+			</div>
+			<!-- 多说分享 end -->
+			<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+			<script type="text/javascript">
+				var duoshuoQuery = {short_name:"kellerblog"};
+				(function() {
+					var ds = document.createElement('script');
+					ds.type = 'text/javascript';ds.async = true;
+					ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+					ds.charset = 'UTF-8';
+					(document.getElementsByTagName('head')[0]
+					|| document.getElementsByTagName('body')[0]).appendChild(ds);
+				})();
+			</script>
+			<!-- 多说公共JS代码 end -->
+
+        </section>
+	</body>
+</html>
