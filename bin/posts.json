@@ -133,5 +133,14 @@
     "md_file": "/js-prototype-property.md",
     "html_file": "/js-prototype-property.html",
     "url": "/js-prototype-property.html"
+  },
+  {
+    "id": "p16",
+    "title": "基于docker部署node应用",
+    "date": 1450144681304,
+    "description": "基于docker部署node应用",
+    "md_file": "/docker-node.md",
+    "html_file": "/docker-node.html",
+    "url": "/docker-node.html"
   }
 ]

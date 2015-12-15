@@ -1,0 +1,191 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<title>基于docker部署node应用</title>
+	<link href="./img/keller.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="./css/style.css" rel="stylesheet" />
+	<link href="./css/zenburn.css" rel="stylesheet" />
+	<script src="./js/highlight.pack.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+</head>
+	<body>
+		<aside>
+			<h1>
+				<a>
+					<img src="./img/keller.png">
+					</img>
+				</a>
+			</h1>
+			<p class="disc">
+				欢迎来到我的博客
+			</p>
+			<p>
+				<ul>
+					<li><a href="/">主页</a></li>
+					<li><a href="https://github.com/keller35">github</a></li>
+					<li><a href="/links.html">links</a></li>
+				</ul>
+			</p>
+		</aside>
+		<section>
+			<div>
+				<p id="title">基于docker部署node应用</p>
+				<p id="date">2015-12-15</p>
+			</div>
+			<p><a href="https://www.docker.com/">Docker</a>是开源的容器引擎，开发者可以将自己的应用和应用的依赖环境打包到docker中，作为一个可移植的容器。
+利用这个容器，可以实现非常简单的移植部署，保证开发、测试和生产环境的一致性。</p>
+<p>最近需要将公司的服务docker化，所以这里记录一下此次的部署过程。</p>
+<h2>安装docker</h2>
+<p>docker的安装对操作系统有一定的要求，具体可见<a href="https://docs.docker.com/engine/installation/">文档</a>。
+这里以我使用的Ubuntu为例，docker要求系统必须是64位，内核版本不低于3.10。有关内核版本可以通过<code>uname -a</code>查看。</p>
+<pre><code>Linux iZ288jjee7mZ 3.13.0-32-generic #57-Ubuntu SMP Tue Jul 15 03:51:08 UTC 2014 x86_64 x86_64 x86_64 GNU/Linux
+</code></pre>
+<p>docker安装：</p>
+<pre><code>$ curl -sSL https://get.docker.com/ | sh
+</code></pre>
+<p>docker是c/s模式的程序，客户端和守护进程可以进行通信，守护进程负责处理任务。</p>
+<p>通过查看版本信息，确认docker安装成功</p>
+<pre><code>$ sudo docker version
+</code></pre>
+<h2>应用镜像创建</h2>
+<p>我的应用架构如下：</p>
+<pre><code>nginx：
+
+    监听80端口，作为对外的唯一访问入口，实现对api访问的负载均衡
+
+node：
+
+    提供RESTful api，利用redis进行数据缓存，利用mongo进行数据存储；
+
+redis：
+
+    实现数据缓存
+
+mongo：
+
+    实现数据存储
+</code></pre>
+<p>对于以上架构，需要创建四个镜像，即nginx镜像、api镜像、redis镜像和mongo镜像。</p>
+<p>首先从底层数据存储层开始，因为redis和mongo只对外提供服务，如果不需要修改他们的默认配置的情况下，直接使用registry中现有的镜像即可满足我的要求
+（docker hub因为墙的原因，访问很慢，所以这里使用国内服务商提供的镜像）。</p>
+<p>redis：</p>
+<pre><code>docker pull daocloud.io/daocloud/dao-redis:master-init
+</code></pre>
+<p>mongo:</p>
+<pre><code>docker pull daocloud.io/library/mongo:latest
+</code></pre>
+<p>接下来是api镜像，这个镜像的基础环境是node镜像，同时还需要在容器中挂载我的源代码（这里没有在镜像中ADD源代码，是因为在后面，将会在启动容器时进行文件挂载），
+导出端口，最后启动node进程，所以这里使用Dockerfile来描述镜像：</p>
+<pre><code>FROM daocloud.io/library/node:latest
+EXPOSE 5000
+CMD [&quot;node&quot;, &quot;/usr/local/api/app&quot;]
+</code></pre>
+<p>在当前上下文环境创建镜像：</p>
+<pre><code>docker build -t keller35/api:init .
+</code></pre>
+<p>在创建nginx镜像之前，首先需要设置自己的nginx配置如下：</p>
+<pre><code>upstream api-cluster {
+    server api1:5000 weight=5;
+    server api2:5000 weight=5;
+    server api3:5000 weight=5;
+}
+
+server {
+
+    listen 80 default_server;
+    server_name 127.0.0.1;
+
+    location / {
+        root         /usr/local/api;
+        index        index.html;
+    }
+
+    location /api {
+        client_max_body_size   200M;
+        keepalive_timeout    1800;
+        proxy_pass http://api-cluster;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-Ip $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+</code></pre>
+<p>将以上保存为文件<code>api.conf</code>，nginx镜像的Dockerfile如下：</p>
+<pre><code>FROM index.alauda.cn/library/nginx
+COPY api.conf /etc/nginx/conf.d/api.conf
+</code></pre>
+<p>然后执行</p>
+<pre><code>docker build -t keller35/nginx:init .
+</code></pre>
+<p>就会将自定义的nginx配置文件copy到nginx镜像中，所以nginx启动时将会加载自定义的配置。</p>
+<h2>启动容器</h2>
+<p>各个容器之间通过docker提供的内部<code>link system</code>互相连接，通过link连接的容器内部有关于连接信息的环境变量，例如通过<code>--link redis:redis</code>将node容器连接至redis容器，
+那么在node容器中可以通过<code>REDIS_PORT_6379_TCP_ADDR</code>和<code>REDIS_PORT_6379_TCP_PORT</code>两个环境变量获取redis的连接地址，这样就可以在node避免了硬编码。</p>
+<p>容器启动：</p>
+<pre><code># redis
+docker run --name redis -d daocloud.io/daocloud/dao-redis:master-init
+
+# mongo
+docker run --name mongo -v /data/db:/data/db -d daocloud.io/library/mongo:latest
+
+# api1
+# api2、api3容器的启动方式相同
+docker run --name api1 -d \
+-v /usr/local/api:/usr/local/api \
+--link redis:redis \
+--link mongo:mongo \
+keller35/api:init
+
+# nginx
+docker run --name nginx -p 80:80 \
+--link api1:api1 \
+--link api2:api2 \
+--link api3:api3 \
+-d keller35/nginx:init
+</code></pre>
+<p>查看容器情况：</p>
+<pre><code>docker ps
+</code></pre>
+<p>测试：</p>
+<pre><code>curl http://127.0.0.1/api/xxxx
+</code></pre>
+<p>如果调用Restful api成功，说明容器启动成功。也可以执行容器内部bash：</p>
+<pre><code>docker exec -i -t redis bash
+</code></pre>
+<h2>总结</h2>
+<p>个人感觉通过docker部署有几个优势：</p>
+<p>1、可以保证从开发、测试到生产的环境相同，只要从开发开始维护镜像，那么就能保证测试和最终的生产环境跟开发环境一致，而且基于docker的部署非常简单，大大减少了部署的工作量；</p>
+<p>2、部署的版本控制，通过对镜像tag的管理可以实现对部署版本的管理；</p>
+<p>3、水平扩展，利用docker容器的隔离，可以很快实现无状态应用的水平扩展。</p>
+
+
+			<!-- 多说评论框 start -->
+			<div class="ds-thread flat" data-thread-key="p16" data-title="基于docker部署node应用" data-url="/docker-node.html"></div>
+			<!-- 多说评论框 end -->
+			<!-- 多说分享 start -->
+			<div class="ds-share flat" data-thread-key="p16" data-title="基于docker部署node应用" data-images="/img/keller.png" data-content="基于docker部署node应用" data-url="/docker-node.html">
+				<div class="ds-share-aside-right">
+					<div class="ds-share-aside-inner">
+					</div>
+					<div class="ds-share-aside-toggle">分享到</div>
+				</div>
+			</div>
+			<!-- 多说分享 end -->
+			<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+			<script type="text/javascript">
+				var duoshuoQuery = {short_name:"kellerblog"};
+				(function() {
+					var ds = document.createElement('script');
+					ds.type = 'text/javascript';ds.async = true;
+					ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+					ds.charset = 'UTF-8';
+					(document.getElementsByTagName('head')[0]
+					|| document.getElementsByTagName('body')[0]).appendChild(ds);
+				})();
+			</script>
+			<!-- 多说公共JS代码 end -->
+
+        </section>
+	</body>
+</html>
