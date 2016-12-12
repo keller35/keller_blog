@@ -1,0 +1,110 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<title>gitflow梳理</title>
+	<link href="./img/keller.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="./css/style.css" rel="stylesheet" />
+	<link href="./css/zenburn.css" rel="stylesheet" />
+	<script src="./js/highlight.pack.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+</head>
+	<body>
+		<aside>
+			<h1>
+				<a>
+					<img src="./img/keller.png">
+					</img>
+				</a>
+			</h1>
+			<p class="disc">
+				欢迎来到我的博客
+			</p>
+			<p>
+				<ul>
+					<li><a href="/">主页</a></li>
+					<li><a href="https://github.com/keller35">github</a></li>
+					<li><a href="/links.html">links</a></li>
+				</ul>
+			</p>
+		</aside>
+		<section>
+			<div>
+				<p id="title">gitflow梳理</p>
+				<p id="date">2016-12-13</p>
+			</div>
+			<p>最开始接触git的时候，使用的git分支模型就是github默认支持的github flow。</p>
+<p>后来在新公司基于业务需要，设计了一套适合业务版本发布的git流程，用得也挺顺手。</p>
+<p>而最近又接触了gitflow，发现也有合理的地方。</p>
+<p>总的看下来，他们都有各自适合的场景，既有优势也有缺点，所以总结对比一下。</p>
+<h2>1、github flow</h2>
+<p><img src="../img/git-github-flow.png" alt="post"></p>
+<p>最简单的模型，就是github flow。</p>
+<p>github flow只包含master分支和特性分支，所有其他特性分支通过pull request对master进行合并。</p>
+<p>对于github flow，只有master一个分支用于测试和发布，并且测试的都是即将发布的提交。</p>
+<h3>总结：</h3>
+<p>github flow的特点就是多次快速发布。对于需要经常短期多次发布的业务，加上自动化测试和自动化发布，效率会非常高。</p>
+<hr>
+<h2>2、gitflow</h2>
+<p><img src="../img/git-gitflow.png" alt="post"></p>
+<p>git flow相对复杂：</p>
+<p>dev分支是主分支，反映了最新的需要发布的修改；</p>
+<p>feature分支从dev分支切出，用于开发新特性，开发完后并且确认需要发布，可以合并回dev；</p>
+<p>合并回dev后，可以切出release分支进行测试和特性修复，这里不建议做大的特性修改（大的修改应在前期feature测试充分再合并到dev），release测试通过后可以合并回dev，并合并到master进行发布；</p>
+<p>合并后的master分支可以进行回归测试，如果master有需要修改的bug，可以切出hotfix分支进行修复，修复完hotfix要合并到dev和master；</p>
+<p>整个过程中，固有的分支只有dev和master分支，特性开发围绕dev展开，bug修复围绕master展开；</p>
+<p>而需要测试的分支包括release分支和master分支，master分支用作最后的回归测试。</p>
+<p>优点：</p>
+<p>gitflow保证了dev分支的稳定性，要求合并到dev分支的代码必须是可测试的，保证了后续切出的feature分支是在稳定的代码上开发的（虽然不一定是最终的代码）；</p>
+<p>缺点：</p>
+<p>测试的过程中，需要切换不同的release分支进行测试。</p>
+<h3>总结：</h3>
+<p>总的来说，按照gitflow的流程进行的开发，基本是不存在版本混乱的问题的。</p>
+<hr>
+<h2>3、自定义flow</h2>
+<p><img src="../img/git-my-gitflow.jpeg" alt="post"></p>
+<p>分析了git flow之后回过头来看看曾经我们自己设计的git流程（我画了张简图）。</p>
+<p>我们设计了四个分支类型，其中master分支用于发布；</p>
+<p>feature分支从master切出，用于特性开发；</p>
+<p>feature分支开发完成后，合并到dev进行测试；</p>
+<p>测试通过后，feature分支再合并到pr分支，进行回归测试；</p>
+<p>回归测试通过后，pr分支合并到master分支进行发布，删除feature分支；</p>
+<p>如果线上master出现了bug，直接从master切出hotfix分支，修复完成后合并dev、pr，并在pr上测试。</p>
+<p>优点：</p>
+<p>测试分支固定，不需要切换。</p>
+<p>缺点：</p>
+<p>对比gitflow可以看出pr分支是多余的，完全可以用master代替，版本出现问题使用回滚即可；</p>
+<p>dev分支不稳定，多个feature分支都可随时合并到dev，dev测试通过的版本跟最终回归测试的版本不一定相同，这会导致bug在不同的分支不能复现的问题。</p>
+<h3>总结：</h3>
+<p>这个流程的设计明显是有问题的，在参与人数较少的情况下尚可使用，但是当参与人数多的时候，就可能会引起版本混乱。</p>
+
+
+			<!-- 多说评论框 start -->
+			<div class="ds-thread flat" data-thread-key="p17" data-title="gitflow梳理" data-url="/gitflow.html"></div>
+			<!-- 多说评论框 end -->
+			<!-- 多说分享 start -->
+			<div class="ds-share flat" data-thread-key="p17" data-title="gitflow梳理" data-images="/img/keller.png" data-content="gitflow梳理" data-url="/gitflow.html">
+				<div class="ds-share-aside-right">
+					<div class="ds-share-aside-inner">
+					</div>
+					<div class="ds-share-aside-toggle">分享到</div>
+				</div>
+			</div>
+			<!-- 多说分享 end -->
+			<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+			<script type="text/javascript">
+				var duoshuoQuery = {short_name:"kellerblog"};
+				(function() {
+					var ds = document.createElement('script');
+					ds.type = 'text/javascript';ds.async = true;
+					ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+					ds.charset = 'UTF-8';
+					(document.getElementsByTagName('head')[0]
+					|| document.getElementsByTagName('body')[0]).appendChild(ds);
+				})();
+			</script>
+			<!-- 多说公共JS代码 end -->
+
+        </section>
+	</body>
+</html>
