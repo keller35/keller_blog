@@ -1,0 +1,126 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<title>React中this的问题</title>
+	<link href="./img/keller.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="./css/style.css" rel="stylesheet" />
+	<link href="./css/zenburn.css" rel="stylesheet" />
+	<script src="./js/highlight.pack.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+</head>
+	<body>
+		<aside>
+			<h1>
+				<a>
+					<img src="./img/keller.png">
+					</img>
+				</a>
+			</h1>
+			<p class="disc">
+				欢迎来到我的博客
+			</p>
+			<p>
+				<ul>
+					<li><a href="/">主页</a></li>
+					<li><a href="https://github.com/keller35">github</a></li>
+					<li><a href="/links.html">links</a></li>
+				</ul>
+			</p>
+		</aside>
+		<section>
+			<div>
+				<p id="title">React中this的问题</p>
+				<p id="date">2017-01-02</p>
+			</div>
+			<p>刚开始用React的时候，经常会出现this绑定错误的问题，导致获取不到组件的state和props。</p>
+<p>虽然这是js语言本身带来的坑，但是作为填坑人，解决这个问题也是义不容辞的任务，哈哈。</p>
+<p>其实梳理一下React中this绑定的出现情况，还是有解决问题的最佳实践的。</p>
+<p>首先引出问题：</p>
+<h2>一、不同组件创建方式的this绑定问题</h2>
+<p>1、通过<code>React.createClass</code>方式创建的组件，React在创建时会将内部函数自动绑定this为组件实例，所以除非修改this绑定，否则this都会指向组件实例。</p>
+<p>这种方式通常情况下没有问题，但是某些情况下会导致误解。因为React已经假设你的所有handler都是来自当前定义组件，所以this默认指向当前组件实例。</p>
+<p>作为一个框架，本不应该假设用户的使用场景，这样的假设侵入性太大，所以React推荐使用另外一种方式定义组件。</p>
+<p>2、通过<code>extends React.Component</code>方式创建的组件，内部函数默认不绑定this。</p>
+<p>其中，生命周期相关的函数由组件实例调用，例如render、componentDidMount函数都会通过<code>component.render()</code>的方式调用，所以函数中的this默认指向实例对象，这些都没问题。</p>
+<p>但是，类似event handler这样的函数，它们的调用方式有千万种可能，其中最有可能来自子组件的调用，如：</p>
+<pre><code>class Inner extends React.Component {
+    constructor(props){
+        super(props);
+    }
+    render() {
+        return &lt;p onClick={this.props.handler}&gt;click here&lt;/p&gt;;
+    }
+}
+
+class Outer extends React.Component {
+    handler() {
+        console.log(this);
+    }
+    render() {
+        return &lt;Inner handler={this.handler}&gt;&lt;/Inner&gt;;
+    }
+}
+</code></pre>
+<p>子组件通过这种方式调用父组件定义的handler，那么handler里的this就指向window对象，因为dom结构的event handler是由global的window对象调用的。</p>
+<p>所以，这样会出现丢失this的情况。</p>
+<h2>二，解决extends Component的this绑定问题</h2>
+<p>React推荐通过<code>extends React.Component</code>的方式定义组件，所以当我们在handler中需要获取state或者props时，就要解决this绑定的问题。</p>
+<p>有以下两种方法来初始化handler的this：</p>
+<p>1、在<code>constructor</code>里绑定this，如</p>
+<pre><code>class Comp extends React.Component {
+    constructor(props){
+        super(props);
+        this.myHandler = this.myHandler.bind(this);
+    }
+    myHandler() {
+        console.log(this);
+    }
+}
+</code></pre>
+<p>这种方式利用在constructor中this指向实例来提前绑定到handler的this。</p>
+<p>2、利用箭头函数this的默认绑定</p>
+<pre><code>class Comp extends React.Component {
+    constructor(props){
+        super(props);
+    }
+    myHandler = () =&gt; {
+        console.log(this);
+    }
+}
+</code></pre>
+<p>myHandler定义为箭头函数，那么this就指向定义时的函数作用域中的this，也就是组件实例。</p>
+<p>其实原理跟第一种一样，但是方法会优雅很多。</p>
+<h2>三、总结</h2>
+<p>使用<code>extends</code>方式定义组件，该绑定this的handler通过箭头函数提前绑定，不需要绑定this的注意使用时的this指向，that's all。</p>
+
+
+			<!-- 多说评论框 start -->
+			<div class="ds-thread flat" data-thread-key="p18" data-title="React中this的问题" data-url="/react-this.html"></div>
+			<!-- 多说评论框 end -->
+			<!-- 多说分享 start -->
+			<div class="ds-share flat" data-thread-key="p18" data-title="React中this的问题" data-images="/img/keller.png" data-content="react中this的问题" data-url="/react-this.html">
+				<div class="ds-share-aside-right">
+					<div class="ds-share-aside-inner">
+					</div>
+					<div class="ds-share-aside-toggle">分享到</div>
+				</div>
+			</div>
+			<!-- 多说分享 end -->
+			<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+			<script type="text/javascript">
+				var duoshuoQuery = {short_name:"kellerblog"};
+				(function() {
+					var ds = document.createElement('script');
+					ds.type = 'text/javascript';ds.async = true;
+					ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+					ds.charset = 'UTF-8';
+					(document.getElementsByTagName('head')[0]
+					|| document.getElementsByTagName('body')[0]).appendChild(ds);
+				})();
+			</script>
+			<!-- 多说公共JS代码 end -->
+
+        </section>
+	</body>
+</html>
