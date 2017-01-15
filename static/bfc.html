@@ -1,0 +1,165 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<title>BFC</title>
+	<link href="./img/keller.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="./css/style.css" rel="stylesheet" />
+	<link href="./css/zenburn.css" rel="stylesheet" />
+	<script src="./js/highlight.pack.js"></script>
+	<script>hljs.initHighlightingOnLoad();</script>
+</head>
+	<body>
+		<aside>
+			<h1>
+				<a>
+					<img src="./img/keller.png">
+					</img>
+				</a>
+			</h1>
+			<p class="disc">
+				欢迎来到我的博客
+			</p>
+			<p>
+				<ul>
+					<li><a href="/">主页</a></li>
+					<li><a href="https://github.com/keller35">github</a></li>
+					<li><a href="/links.html">links</a></li>
+				</ul>
+			</p>
+		</aside>
+		<section>
+			<div>
+				<p id="title">BFC</p>
+				<p id="date">2017-01-15</p>
+			</div>
+			<p>BFC(Block formatting context)直译为&quot;块级格式化上下文&quot;。
+它是一个独立的渲染区域，只有Block-level box参与， 它规定了内部的Block-level Box如何布局，并且与这个区域外部毫不相干。</p>
+<h4>BFC布局规则:</h4>
+<ul>
+<li>内部的Box会在垂直方向，一个接一个地放置。</li>
+<li>Box垂直方向的距离由margin决定。属于同一个BFC的两个相邻Box的margin会发生重叠。</li>
+<li>每个元素的margin box的左边， 与包含块border box的左边相接触(对于从左往右的格式化，否则相反)。即使存在浮动也是如此。</li>
+<li>BFC的区域不会与float box重叠。</li>
+<li>BFC就是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素。反之也如此。</li>
+<li>计算BFC的高度时，浮动元素也参与计算。</li>
+</ul>
+<h4>个人总结为：</h4>
+<ul>
+<li>对内包裹浮动元素和margin；</li>
+<li>对外保持独立性；</li>
+</ul>
+<h4>那些元素会生成BFC:</h4>
+<ul>
+<li>根元素</li>
+<li>float属性不为none</li>
+<li>position为absolute或fixed</li>
+<li>display为inline-block, table-cell, table-caption, flex, inline-flex</li>
+<li>overflow不为visible</li>
+</ul>
+<h4>例子:</h4>
+<p>包裹浮动元素:</p>
+<p><img src="../img/bfc-1.png" alt="post"></p>
+<pre><code>&lt;html&gt;
+    &lt;head&gt;
+        &lt;style&gt;
+            .container {
+                border: 1px solid black;
+                background: #aaa;
+                overflow: hidden;
+                /*float: left;*/
+            }
+            .content {
+                float: left;
+                width: 100px;
+                height: 100px;
+                background: #000;
+            }
+        &lt;/style&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div class=&quot;container&quot;&gt;
+            &lt;div class=&quot;content&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>包裹margin：</p>
+<p><img src="../img/bfc-2.png" alt="post"></p>
+<pre><code>&lt;html&gt;
+    &lt;head&gt;
+        &lt;style&gt;
+            .container {
+                border: 1px solid black;
+                background: #aaa;
+                overflow: hidden;
+            }
+            .content {
+                margin-top: 50px;
+                width: 100px;
+                height: 100px;
+                background: #000;
+            }
+        &lt;/style&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div class=&quot;container&quot;&gt;
+            &lt;div class=&quot;content&quot;&gt;&lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>对外保持独立性：</p>
+<p><img src="../img/bfc-3.png" alt="post"></p>
+<pre><code>&lt;html&gt;
+    &lt;head&gt;
+        &lt;style&gt;
+            .left-content {
+                float: left;
+                width: 100px;
+                height: 100px;
+                background: #000;
+            }
+            .right-content {
+                height: 200px;
+                background: #aaa;
+                overflow: hidden;
+            }
+        &lt;/style&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div class=&quot;left-content&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;right-content&quot;&gt;&lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+
+			<!-- 多说评论框 start -->
+			<div class="ds-thread flat" data-thread-key="p19" data-title="BFC" data-url="/bfc.html"></div>
+			<!-- 多说评论框 end -->
+			<!-- 多说分享 start -->
+			<div class="ds-share flat" data-thread-key="p19" data-title="BFC" data-images="/img/keller.png" data-content="BFC" data-url="/bfc.html">
+				<div class="ds-share-aside-right">
+					<div class="ds-share-aside-inner">
+					</div>
+					<div class="ds-share-aside-toggle">分享到</div>
+				</div>
+			</div>
+			<!-- 多说分享 end -->
+			<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+			<script type="text/javascript">
+				var duoshuoQuery = {short_name:"kellerblog"};
+				(function() {
+					var ds = document.createElement('script');
+					ds.type = 'text/javascript';ds.async = true;
+					ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+					ds.charset = 'UTF-8';
+					(document.getElementsByTagName('head')[0]
+					|| document.getElementsByTagName('body')[0]).appendChild(ds);
+				})();
+			</script>
+			<!-- 多说公共JS代码 end -->
+
+        </section>
+	</body>
+</html>
